@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Laptop Recommender - Find Your Perfect Laptop{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-text">
+                <h1>Find Your Perfect Laptop Match</h1>
+                <p class="lead mb-4">Our AI-powered recommendation system analyzes your needs and preferences to suggest the best laptops for you.</p>
+                <a href="{{ url_for('questionnaire') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-magic me-2"></i>Find My Laptop
+                </a>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block text-center">
+                <!-- SVG laptop illustration -->
+                <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="80" y="50" width="240" height="160" rx="5" fill="#333" stroke="#555" stroke-width="2"/>
+                    <rect x="90" y="60" width="220" height="140" rx="2" fill="#0D6EFD" opacity="0.7"/>
+                    <rect x="50" y="210" width="300" height="20" rx="5" fill="#444"/>
+                    <rect x="30" y="230" width="340" height="10" rx="5" fill="#333"/>
+                    <circle cx="200" cy="225" r="3" fill="#666"/>
+                    <!-- Binary/code pattern for screen -->
+                    <text x="110" y="80" fill="white" font-family="monospace" font-size="6">01001010 01010101 01010011 01010100</text>
+                    <text x="110" y="90" fill="white" font-family="monospace" font-size="6">01000001 01001001 00100000 01001101 01001111 01000100 01000101 01001100</text>
+                    <text x="110" y="100" fill="white" font-family="monospace" font-size="6">01010010 01000101 01000011 01001111 01001101 01001101 01000101 01001110 01000100 01000001 01010100 01001001 01001111 01001110</text>
+                    <text x="110" y="120" fill="white" font-family="monospace" font-size="8">def recommend_laptop(preferences):</text>
+                    <text x="120" y="135" fill="white" font-family="monospace" font-size="8">return best_match(preferences)</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content Section -->
+<div class="container">
+    <!-- Search Results (if applicable) -->
+    {% if search_query %}
+    <div class="mb-4">
+        <h2>Search Results for "{{ search_query }}"</h2>
+        {% if laptops|length == 0 %}
+        <div class="alert alert-info">
+            No laptops found matching your search criteria. Try a different search term or <a href="{{ url_for('questionnaire') }}">use our AI recommender</a>.
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <!-- How It Works Section -->
+    <section class="mb-5">
+        <h2 class="text-center mb-4">How Our AI Recommender Works</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 bg-dark">
+                    <div class="card-body text-center">
+                        <div class="mb-3 text-primary">
+                            <i class="fas fa-clipboard-list fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">1. Answer Questions</h5>
+                        <p class="card-text text-muted">Tell us about your needs, budget, and how you'll use your laptop through our smart questionnaire.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 bg-dark">
+                    <div class="card-body text-center">
+                        <div class="mb-3 text-primary">
+                            <i class="fas fa-brain fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">2. AI Analysis</h5>
+                        <p class="card-text text-muted">Our ML algorithms analyze your answers against real-world benchmarks and performance data.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 bg-dark">
+                    <div class="card-body text-center">
+                        <div class="mb-3 text-primary">
+                            <i class="fas fa-laptop-code fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">3. Get Matched</h5>
+                        <p class="card-text text-muted">Receive personalized laptop recommendations optimized for your specific needs and budget.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Categories Section -->
+    <section class="mb-5">
+        <h2 class="mb-4">Browse by Category</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <a href="{{ url_for('search') }}?q=gaming" class="text-decoration-none">
+                    <div class="card bg-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-gamepad fa-3x mb-3 text-danger"></i>
+                            <h5 class="card-title">Gaming</h5>
+                            <p class="card-text text-muted">{{ categories.gaming }} Laptops</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('search') }}?q=business" class="text-decoration-none">
+                    <div class="card bg-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-briefcase fa-3x mb-3 text-primary"></i>
+                            <h5 class="card-title">Business</h5>
+                            <p class="card-text text-muted">{{ categories.business }} Laptops</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('search') }}?q=student" class="text-decoration-none">
+                    <div class="card bg-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-graduation-cap fa-3x mb-3 text-success"></i>
+                            <h5 class="card-title">Student</h5>
+                            <p class="card-text text-muted">{{ categories.student }} Laptops</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('search') }}?q=content" class="text-decoration-none">
+                    <div class="card bg-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-paint-brush fa-3x mb-3 text-info"></i>
+                            <h5 class="card-title">Content Creation</h5>
+                            <p class="card-text text-muted">{{ categories.content_creation }} Laptops</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Featured Laptops Section -->
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Featured Laptops</h2>
+            <div>
+                <button class="btn btn-primary" id="compare-selected" disabled>
+                    <i class="fas fa-exchange-alt me-2"></i>Compare (<span id="comparison-count">0</span>)
+                </button>
+            </div>
+        </div>
+    {% endif %}
+        
+    <!-- Laptop Cards -->
+    <div class="row g-4">
+        {% for laptop in laptops %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card laptop-card">
+                <div class="card-header bg-dark d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">{{ laptop.brand }}</span>
+                    {% if laptop.value_category %}
+                    <span class="badge bg-{{ 'success' if laptop.value_category == 'Budget' else 'primary' if laptop.value_category == 'Mid-Range' else 'danger' }}">
+                        {{ laptop.value_category }}
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ laptop.model }}</h5>
+                    
+                    <!-- Laptop categories -->
+                    <div class="mb-3">
+                        {% if laptop.suitable_for_gaming %}
+                        <span class="category-badge category-gaming">Gaming</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_business %}
+                        <span class="category-badge category-business">Business</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_students %}
+                        <span class="category-badge category-student">Student</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_content_creation %}
+                        <span class="category-badge category-content">Content Creation</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Laptop specs -->
+                    <div class="laptop-specs">
+                        <div><strong>CPU:</strong> {{ laptop.cpu }}</div>
+                        <div><strong>GPU:</strong> {{ laptop.gpu }}</div>
+                        <div><strong>RAM:</strong> {{ laptop.ram }}GB</div>
+                        <div><strong>Storage:</strong> {{ laptop.storage_capacity }}GB {{ laptop.storage_type }}</div>
+                        <div><strong>Display:</strong> {{ laptop.display_size }}" {{ laptop.display_resolution }}{% if laptop.display_refresh_rate %} @ {{ laptop.display_refresh_rate }}Hz{% endif %}</div>
+                    </div>
+                    
+                    <!-- Price & rating -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="price">${{ "%.2f"|format(laptop.price) }}</div>
+                        <div class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if laptop.user_rating and i < laptop.user_rating|int %}
+                                    <i class="fas fa-star"></i>
+                                {% elif laptop.user_rating and i < laptop.user_rating and i >= laptop.user_rating|int %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('laptop_detail', laptop_id=laptop.id) }}" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-info-circle me-1"></i>Details
+                        </a>
+                        <button class="btn btn-outline-success add-to-compare" data-laptop-id="{{ laptop.id }}">
+                            <i class="fas fa-plus"></i> Add to Comparison
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-warning">
+                No laptops found. Please try a different search or check back later.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% if not search_query %}
+    <!-- AI Recommendation CTA -->
+    <div class="text-center mt-5 mb-3">
+        <h3>Not sure which laptop is right for you?</h3>
+        <p class="lead">Let our AI analyze your needs and suggest the perfect match.</p>
+        <a href="{{ url_for('questionnaire') }}" class="btn btn-lg btn-primary">
+            <i class="fas fa-magic me-2"></i>Get Personalized Recommendations
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}

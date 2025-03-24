@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Favorite Laptops{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Your Favorite Laptops</h1>
+    
+    {% if favorites %}
+    <!-- Comparison Button -->
+    <div class="mb-4 d-flex justify-content-end">
+        {% if favorites|length >= 2 %}
+        <a href="{{ url_for('comparison') }}?{{ favorites|map(attribute='id')|map('string')|map('regex_replace', '^(.*)$', 'laptop_id=\\1')|join('&') }}" class="btn btn-primary">
+            <i class="fas fa-exchange-alt me-2"></i>Compare Favorites
+        </a>
+        {% else %}
+        <button class="btn btn-primary disabled" disabled>
+            <i class="fas fa-exchange-alt me-2"></i>Need at least 2 laptops to compare
+        </button>
+        {% endif %}
+    </div>
+    
+    <!-- Favorite Laptops Grid -->
+    <div class="row g-4">
+        {% for laptop in favorites %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card laptop-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">{{ laptop.brand }}</span>
+                    <span class="badge bg-{{ 'success' if laptop.value_category == 'Budget' else 'primary' if laptop.value_category == 'Mid-Range' else 'danger' }}">
+                        {{ laptop.value_category }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ laptop.model }}</h5>
+                    
+                    <!-- Laptop categories -->
+                    <div class="mb-3">
+                        {% if laptop.suitable_for_gaming %}
+                        <span class="category-badge category-gaming">Gaming</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_business %}
+                        <span class="category-badge category-business">Business</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_students %}
+                        <span class="category-badge category-student">Student</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_content_creation %}
+                        <span class="category-badge category-content">Content Creation</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Laptop specs -->
+                    <div class="laptop-specs">
+                        <div><strong>CPU:</strong> {{ laptop.cpu }}</div>
+                        <div><strong>GPU:</strong> {{ laptop.gpu }}</div>
+                        <div><strong>RAM:</strong> {{ laptop.ram }}GB</div>
+                        <div><strong>Storage:</strong> {{ laptop.storage_capacity }}GB {{ laptop.storage_type }}</div>
+                        <div><strong>Display:</strong> {{ laptop.display_size }}" {{ laptop.display_resolution }}{% if laptop.display_refresh_rate %} @ {{ laptop.display_refresh_rate }}Hz{% endif %}</div>
+                    </div>
+                    
+                    <!-- Price & rating -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="price">${{ "%.2f"|format(laptop.price) }}</div>
+                        <div class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if laptop.user_rating and i < laptop.user_rating|int %}
+                                    <i class="fas fa-star"></i>
+                                {% elif laptop.user_rating and i < laptop.user_rating and i >= laptop.user_rating|int %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('laptop_detail', laptop_id=laptop.id) }}" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-info-circle me-1"></i>View Details
+                        </a>
+                        <form method="POST" action="{{ url_for('remove_from_favorites', laptop_id=laptop.id) }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-heart text-muted fa-4x mb-3"></i>
+            <h3>No Favorites Yet</h3>
+            <p class="text-muted mb-4">You haven't added any laptops to your favorites list.</p>
+            <div>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Browse Laptops
+                </a>
+                <a href="{{ url_for('questionnaire') }}" class="btn btn-outline-primary ms-2">
+                    <i class="fas fa-magic me-2"></i>Get Recommendations
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}

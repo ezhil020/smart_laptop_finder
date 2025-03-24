@@ -1,0 +1,275 @@
+/* Laptop Recommender System - Custom Styles */
+
+/* General Styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-top: 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(to right, #0d253f, #213b60);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+}
+
+.hero-text h1 {
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-text p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Laptop Card Styles */
+.laptop-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    height: 100%;
+}
+
+.laptop-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.laptop-card .card-img-top {
+    height: 200px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    padding: 1rem;
+}
+
+.laptop-card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.laptop-card .btn-group {
+    margin-top: auto;
+}
+
+.laptop-specs {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.price {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #0d6efd;
+    margin-bottom: 0.5rem;
+}
+
+/* Questionnaire Styles */
+.question-step {
+    display: none;
+}
+
+.question-step.active {
+    display: block;
+}
+
+.questionnaire-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    background-color: rgba(var(--bs-light-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-light-rgb), 0.2);
+}
+
+.questionnaire-title {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.questionnaire-progress {
+    margin-bottom: 2rem;
+}
+
+/* Range Slider Customization */
+.priority-slider {
+    width: 100%;
+}
+
+.slider-value {
+    text-align: center;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+}
+
+/* Results Page Styles */
+.recommendation-card {
+    border-left: 5px solid #0d6efd;
+    transition: transform 0.3s ease;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-5px);
+}
+
+.recommendation-card.top-pick {
+    border-left-color: #198754;
+}
+
+.recommendation-card .card-header {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.recommendation-card.top-pick .card-header {
+    background-color: rgba(25, 135, 84, 0.1);
+}
+
+.top-pick-badge {
+    background-color: #198754;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+/* Comparison Page Styles */
+.comparison-table th {
+    position: sticky;
+    top: 60px;
+    background-color: var(--bs-body-bg);
+    z-index: 1;
+}
+
+.spec-row:nth-child(odd) {
+    background-color: rgba(var(--bs-light-rgb), 0.05);
+}
+
+.best-spec {
+    color: #198754;
+    font-weight: bold;
+    position: relative;
+}
+
+.best-spec::after {
+    content: "★";
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.8rem;
+    color: #198754;
+}
+
+/* Detail Page Styles */
+.spec-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(var(--bs-light-rgb), 0.1);
+}
+
+.spec-name {
+    font-weight: 600;
+    color: #6c757d;
+}
+
+.spec-value {
+    text-align: right;
+    font-weight: 500;
+}
+
+.benchmark-section, .price-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    background-color: rgba(var(--bs-light-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-light-rgb), 0.1);
+}
+
+.price-tag {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0d6efd;
+}
+
+.rating-stars {
+    color: #ffc107;
+    font-size: 1.2rem;
+}
+
+/* Category badges */
+.category-badge {
+    display: inline-block;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.category-gaming {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.category-business {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.category-student {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.category-content {
+    background-color: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+    padding: 2rem 0;
+    background-color: rgba(var(--bs-dark-rgb), 0.95);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 0;
+    }
+    
+    .hero-text h1 {
+        font-size: 2rem;
+    }
+    
+    .comparison-table {
+        font-size: 0.85rem;
+    }
+    
+    .laptop-card .card-img-top {
+        height: 150px;
+    }
+}

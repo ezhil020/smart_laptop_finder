@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ laptop.brand }} {{ laptop.model }} - Details{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ laptop.brand }} {{ laptop.model }}</li>
+        </ol>
+    </nav>
+    
+    <!-- Laptop Detail -->
+    <div class="row">
+        <!-- Left Column: Main Info -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h1 class="card-title mb-1">{{ laptop.brand }} {{ laptop.model }}</h1>
+                    
+                    <!-- Categories -->
+                    <div class="mb-3">
+                        {% if laptop.suitable_for_gaming %}
+                        <span class="category-badge category-gaming">Gaming</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_business %}
+                        <span class="category-badge category-business">Business</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_students %}
+                        <span class="category-badge category-student">Student</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_content_creation %}
+                        <span class="category-badge category-content">Content Creation</span>
+                        {% endif %}
+                        <span class="category-badge" style="background-color: rgba(108, 117, 125, 0.1); color: #6c757d;">
+                            {{ laptop.value_category }}
+                        </span>
+                    </div>
+                    
+                    <!-- Rating -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="rating-stars me-2">
+                            {% for i in range(5) %}
+                                {% if laptop.user_rating and i < laptop.user_rating|int %}
+                                    <i class="fas fa-star"></i>
+                                {% elif laptop.user_rating and i < laptop.user_rating and i >= laptop.user_rating|int %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="text-muted">{{ laptop.user_rating }}/5 User Rating</span>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <!-- Performance Highlights -->
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Performance Highlights</h4>
+                            <div class="spec-item">
+                                <div class="spec-name">CPU Performance</div>
+                                <div class="spec-value">
+                                    {% if laptop.cinebench_score %}
+                                    {% if laptop.cinebench_score > 15000 %}
+                                    <span class="text-success">Excellent</span>
+                                    {% elif laptop.cinebench_score > 10000 %}
+                                    <span class="text-primary">Very Good</span>
+                                    {% elif laptop.cinebench_score > 7000 %}
+                                    <span class="text-info">Good</span>
+                                    {% elif laptop.cinebench_score > 5000 %}
+                                    <span class="text-warning">Average</span>
+                                    {% else %}
+                                    <span class="text-danger">Basic</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Graphics Performance</div>
+                                <div class="spec-value">
+                                    {% if laptop.gaming_fps %}
+                                    {% if laptop.gaming_fps > 120 %}
+                                    <span class="text-success">Exceptional</span>
+                                    {% elif laptop.gaming_fps > 90 %}
+                                    <span class="text-primary">Excellent</span>
+                                    {% elif laptop.gaming_fps > 60 %}
+                                    <span class="text-info">Very Good</span>
+                                    {% elif laptop.gaming_fps > 30 %}
+                                    <span class="text-warning">Good</span>
+                                    {% else %}
+                                    <span class="text-danger">Basic</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Value for Money</div>
+                                <div class="spec-value">
+                                    {% if laptop.price_performance_ratio %}
+                                    {% if laptop.price_performance_ratio > 0.9 %}
+                                    <span class="text-success">Outstanding</span>
+                                    {% elif laptop.price_performance_ratio > 0.8 %}
+                                    <span class="text-primary">Excellent</span>
+                                    {% elif laptop.price_performance_ratio > 0.7 %}
+                                    <span class="text-info">Good</span>
+                                    {% elif laptop.price_performance_ratio > 0.6 %}
+                                    <span class="text-warning">Average</span>
+                                    {% else %}
+                                    <span class="text-danger">Below Average</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Battery Life</div>
+                                <div class="spec-value">
+                                    {% if laptop.battery_life %}
+                                    {% if laptop.battery_life > 10 %}
+                                    <span class="text-success">Excellent ({{ laptop.battery_life }} hrs)</span>
+                                    {% elif laptop.battery_life > 8 %}
+                                    <span class="text-primary">Very Good ({{ laptop.battery_life }} hrs)</span>
+                                    {% elif laptop.battery_life > 6 %}
+                                    <span class="text-info">Good ({{ laptop.battery_life }} hrs)</span>
+                                    {% elif laptop.battery_life > 4 %}
+                                    <span class="text-warning">Average ({{ laptop.battery_life }} hrs)</span>
+                                    {% else %}
+                                    <span class="text-danger">Below Average ({{ laptop.battery_life }} hrs)</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Build Quality</div>
+                                <div class="spec-value">
+                                    {% if laptop.build_quality %}
+                                    {% if laptop.build_quality == 'Excellent' %}
+                                    <span class="text-success">{{ laptop.build_quality }}</span>
+                                    {% elif laptop.build_quality == 'Good' %}
+                                    <span class="text-primary">{{ laptop.build_quality }}</span>
+                                    {% elif laptop.build_quality == 'Average' %}
+                                    <span class="text-info">{{ laptop.build_quality }}</span>
+                                    {% else %}
+                                    <span class="text-warning">{{ laptop.build_quality }}</span>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Core Specifications -->
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Core Specifications</h4>
+                            <div class="spec-item">
+                                <div class="spec-name">CPU</div>
+                                <div class="spec-value">{{ laptop.cpu }}</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">GPU</div>
+                                <div class="spec-value">{{ laptop.gpu }}</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">RAM</div>
+                                <div class="spec-value">{{ laptop.ram }} GB</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Storage</div>
+                                <div class="spec-value">{{ laptop.storage_capacity }} GB {{ laptop.storage_type }}</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Display</div>
+                                <div class="spec-value">{{ laptop.display_size }}" {{ laptop.display_resolution }} {% if laptop.display_refresh_rate %}@ {{ laptop.display_refresh_rate }}Hz{% endif %}</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Weight</div>
+                                <div class="spec-value">{{ laptop.weight or 'N/A' }} {% if laptop.weight %}kg{% endif %}</div>
+                            </div>
+                            <div class="spec-item">
+                                <div class="spec-name">Operating System</div>
+                                <div class="spec-value">{{ laptop.operating_system }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if is_favorite %}
+                        <form method="POST" action="{{ url_for('remove_from_favorites', laptop_id=laptop.id) }}">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-heart-broken me-2"></i>Remove from Favorites
+                            </button>
+                        </form>
+                        {% else %}
+                        <form method="POST" action="{{ url_for('add_to_favorites', laptop_id=laptop.id) }}">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-heart me-2"></i>Add to Favorites
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <button class="btn btn-outline-primary add-to-compare" data-laptop-id="{{ laptop.id }}">
+                            <i class="fas fa-plus me-2"></i>Add to Comparison
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Benchmark Section -->
+            <div class="benchmark-section card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Performance Benchmarks</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="text-center">
+                                <h5>Cinebench</h5>
+                                <div class="display-6 mb-2">{{ laptop.cinebench_score or 'N/A' }}</div>
+                                <small class="text-muted">CPU Performance</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="text-center">
+                                <h5>Geekbench</h5>
+                                <div class="display-6 mb-2">{{ laptop.geekbench_score or 'N/A' }}</div>
+                                <small class="text-muted">Multi-core Performance</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <h5>Gaming FPS</h5>
+                                <div class="display-6 mb-2">{{ laptop.gaming_fps or 'N/A' }}</div>
+                                <small class="text-muted">Average in Modern Games</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Benchmark Chart -->
+                    <div class="mt-4">
+                        <canvas id="benchmarkChart" 
+                                data-laptop="{{ laptop|tojson }}" 
+                                data-similar-laptops="{{ similar_laptops|tojson }}"></canvas>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        All benchmarks are comparative values. Higher is better.
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Value Analysis Section -->
+            <div class="price-section card mb-4">
+                <div class="card-header">
+                    <h4 class="mb-0">Value Analysis</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="text-center">
+                                <div class="price-tag mb-2">${{ "%.2f"|format(laptop.price) }}</div>
+                                <div class="text-muted">
+                                    {% if laptop.value_category == 'Budget' %}
+                                    <span class="badge bg-success">Budget-Friendly</span>
+                                    {% elif laptop.value_category == 'Mid-Range' %}
+                                    <span class="badge bg-primary">Mid-Range</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">High-End</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center">
+                                <h5>Price-Performance Ratio</h5>
+                                <div class="progress mb-2" style="height: 25px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ (laptop.price_performance_ratio or 0) * 100 }}%;" 
+                                         aria-valuenow="{{ (laptop.price_performance_ratio or 0) * 100 }}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        {{ "%.2f"|format(laptop.price_performance_ratio) if laptop.price_performance_ratio else 'N/A' }}
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    Higher is better (max: 1.0)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Value Chart -->
+                    <div class="mt-4">
+                        <canvas id="valueChart" 
+                                data-laptop="{{ laptop|tojson }}" 
+                                data-similar-laptops="{{ similar_laptops|tojson }}"></canvas>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Price-Performance Ratio measures how much value you get for your money.
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: Sidebar -->
+        <div class="col-lg-4">
+            <!-- Price Card -->
+            <div class="card mb-4 bg-primary bg-opacity-10">
+                <div class="card-body text-center">
+                    <h3 class="price-tag">${{ "%.2f"|format(laptop.price) }}</h3>
+                    <p class="lead mb-4">{{ laptop.value_category }}</p>
+                    
+                    {% if is_favorite %}
+                    <form method="POST" action="{{ url_for('remove_from_favorites', laptop_id=laptop.id) }}" class="mb-3">
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="fas fa-heart-broken me-2"></i>Remove from Favorites
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{{ url_for('add_to_favorites', laptop_id=laptop.id) }}" class="mb-3">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-heart me-2"></i>Add to Favorites
+                        </button>
+                    </form>
+                    {% endif %}
+                    
+                    <button class="btn btn-outline-primary w-100 add-to-compare mb-2" data-laptop-id="{{ laptop.id }}">
+                        <i class="fas fa-exchange-alt me-2"></i>Add to Comparison
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Best Suited For -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Best Suited For</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% if laptop.suitable_for_gaming %}
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-gamepad text-danger me-2"></i> Gaming
+                            {% if laptop.gaming_fps and laptop.gaming_fps > 90 %}
+                            <span class="badge bg-success float-end">Excellent</span>
+                            {% elif laptop.gaming_fps and laptop.gaming_fps > 60 %}
+                            <span class="badge bg-primary float-end">Good</span>
+                            {% elif laptop.gaming_fps and laptop.gaming_fps > 30 %}
+                            <span class="badge bg-warning float-end">Fair</span>
+                            {% else %}
+                            <span class="badge bg-secondary float-end">Basic</span>
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                        
+                        {% if laptop.suitable_for_business %}
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-briefcase text-primary me-2"></i> Business/Professional
+                            {% if laptop.battery_life and laptop.battery_life > 10 %}
+                            <span class="badge bg-success float-end">Excellent</span>
+                            {% elif laptop.battery_life and laptop.battery_life > 7 %}
+                            <span class="badge bg-primary float-end">Good</span>
+                            {% elif laptop.battery_life and laptop.battery_life > 5 %}
+                            <span class="badge bg-warning float-end">Fair</span>
+                            {% else %}
+                            <span class="badge bg-secondary float-end">Basic</span>
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                        
+                        {% if laptop.suitable_for_students %}
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-graduation-cap text-success me-2"></i> Student
+                            {% if laptop.price < 700 %}
+                            <span class="badge bg-success float-end">Budget-Friendly</span>
+                            {% elif laptop.price < 1000 %}
+                            <span class="badge bg-primary float-end">Good Value</span>
+                            {% else %}
+                            <span class="badge bg-warning float-end">Premium</span>
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                        
+                        {% if laptop.suitable_for_content_creation %}
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-paint-brush text-info me-2"></i> Content Creation
+                            {% if laptop.cinebench_score and laptop.cinebench_score > 13000 %}
+                            <span class="badge bg-success float-end">Excellent</span>
+                            {% elif laptop.cinebench_score and laptop.cinebench_score > 9000 %}
+                            <span class="badge bg-primary float-end">Good</span>
+                            {% elif laptop.cinebench_score and laptop.cinebench_score > 6000 %}
+                            <span class="badge bg-warning float-end">Fair</span>
+                            {% else %}
+                            <span class="badge bg-secondary float-end">Basic</span>
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                        
+                        {% if not laptop.suitable_for_gaming and not laptop.suitable_for_business and not laptop.suitable_for_students and not laptop.suitable_for_content_creation %}
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-laptop text-secondary me-2"></i> General Use
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Similar Laptops -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Similar Laptops</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% for similar in similar_laptops %}
+                        <a href="{{ url_for('laptop_detail', laptop_id=similar.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <h6 class="mb-1">{{ similar.brand }} {{ similar.model }}</h6>
+                                <span class="price">${{ "%.2f"|format(similar.price) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">
+                                    {{ similar.ram }}GB RAM, {{ similar.storage_capacity }}GB {{ similar.storage_type }}
+                                </small>
+                                <div class="rating-stars" style="font-size: 0.75rem;">
+                                    {% for i in range(5) %}
+                                        {% if similar.user_rating and i < similar.user_rating|int %}
+                                            <i class="fas fa-star"></i>
+                                        {% elif similar.user_rating and i < similar.user_rating and i >= similar.user_rating|int %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </a>
+                        {% else %}
+                        <div class="list-group-item">
+                            <p class="mb-0 text-muted">No similar laptops found.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

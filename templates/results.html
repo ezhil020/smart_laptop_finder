@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Laptop Recommendations{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Your Personalized Laptop Recommendations</h1>
+    
+    <!-- Recommendation Summary -->
+    <div class="alert alert-info mb-4">
+        <h4 class="alert-heading"><i class="fas fa-lightbulb me-2"></i>Based on your preferences</h4>
+        <p>We've analyzed your requirements and found these laptops that best match your needs:</p>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <strong>Use Case:</strong> 
+                {% if preferences.use_case_gaming %}
+                <span>Gaming</span>
+                {% elif preferences.use_case_business %}
+                <span>Business</span>
+                {% elif preferences.use_case_student %}
+                <span>Student</span>
+                {% elif preferences.use_case_content_creation %}
+                <span>Content Creation</span>
+                {% else %}
+                <span>General Use</span>
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <strong>Budget Range:</strong> ${{ preferences.budget_min }} - ${{ preferences.budget_max }}
+            </div>
+            <div class="col-md-4">
+                <strong>Performance Priority:</strong> 
+                {% if preferences.priority_cpu_performance == 5 %}
+                <span>Critical</span>
+                {% elif preferences.priority_cpu_performance == 4 %}
+                <span>Very Important</span>
+                {% elif preferences.priority_cpu_performance == 3 %}
+                <span>Important</span>
+                {% elif preferences.priority_cpu_performance == 2 %}
+                <span>Somewhat Important</span>
+                {% else %}
+                <span>Not Important</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Recommendations -->
+    <h2 class="mb-4">Top Recommendations</h2>
+    <div class="row g-4">
+        {% for laptop in recommendations %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card recommendation-card h-100 {% if loop.first %}top-pick{% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">{{ laptop.brand }}</span>
+                    {% if loop.first %}
+                    <span class="top-pick-badge">Top Pick</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ laptop.model }}</h5>
+                    
+                    <!-- Laptop categories -->
+                    <div class="mb-3">
+                        {% if laptop.suitable_for_gaming %}
+                        <span class="category-badge category-gaming">Gaming</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_business %}
+                        <span class="category-badge category-business">Business</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_students %}
+                        <span class="category-badge category-student">Student</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_content_creation %}
+                        <span class="category-badge category-content">Content Creation</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Laptop specs -->
+                    <div class="laptop-specs">
+                        <div><strong>CPU:</strong> {{ laptop.cpu }}</div>
+                        <div><strong>GPU:</strong> {{ laptop.gpu }}</div>
+                        <div><strong>RAM:</strong> {{ laptop.ram }}GB</div>
+                        <div><strong>Storage:</strong> {{ laptop.storage_capacity }}GB {{ laptop.storage_type }}</div>
+                        <div><strong>Display:</strong> {{ laptop.display_size }}" {{ laptop.display_resolution }}{% if laptop.display_refresh_rate %} @ {{ laptop.display_refresh_rate }}Hz{% endif %}</div>
+                    </div>
+                    
+                    <!-- Match score - visual representation -->
+                    <div class="match-score mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Match Score:</span>
+                            <span class="text-primary fw-bold">
+                                {% if loop.first %}95%{% elif loop.index == 2 %}88%{% else %}82%{% endif %}
+                            </span>
+                        </div>
+                        <div class="progress mt-1" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" 
+                                 style="width: {% if loop.first %}95%{% elif loop.index == 2 %}88%{% else %}82%{% endif %};" 
+                                 aria-valuenow="{% if loop.first %}95{% elif loop.index == 2 %}88{% else %}82{% endif %}" 
+                                 aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Price & rating -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="price">${{ "%.2f"|format(laptop.price) }}</div>
+                        <div class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if laptop.user_rating and i < laptop.user_rating|int %}
+                                    <i class="fas fa-star"></i>
+                                {% elif laptop.user_rating and i < laptop.user_rating and i >= laptop.user_rating|int %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Match highlights -->
+                    <div class="match-highlights mb-3">
+                        {% if preferences.priority_cpu_performance >= 4 and laptop.cinebench_score > 10000 %}
+                        <div class="d-flex align-items-center text-success mb-1">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <small>High CPU performance</small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if preferences.battery_life_importance >= 4 and laptop.battery_life >= 8 %}
+                        <div class="d-flex align-items-center text-success mb-1">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <small>Long battery life ({{ laptop.battery_life }} hours)</small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if preferences.use_case_gaming and laptop.gaming_fps >= 60 %}
+                        <div class="d-flex align-items-center text-success mb-1">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <small>Great gaming performance ({{ laptop.gaming_fps }} FPS)</small>
+                        </div>
+                        {% endif %}
+                        
+                        {% if laptop.price_performance_ratio >= 0.85 %}
+                        <div class="d-flex align-items-center text-success mb-1">
+                            <i class="fas fa-check-circle me-2"></i>
+                            <small>Excellent price-to-performance ratio</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('laptop_detail', laptop_id=laptop.id) }}" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-info-circle me-1"></i>View Details
+                        </a>
+                        <form method="POST" action="{{ url_for('add_to_favorites', laptop_id=laptop.id) }}">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-warning">
+                No recommendations found. Please try adjusting your preferences.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Alternative Suggestions -->
+    {% if alternatives %}
+    <h2 class="mt-5 mb-4">Alternative Suggestions</h2>
+    <p class="text-muted mb-4">Here are some alternative laptops you might want to consider:</p>
+    
+    <div class="row g-4">
+        {% for laptop in alternatives %}
+        <div class="col-md-6">
+            <div class="card recommendation-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="fw-bold">{{ laptop.brand }}</span>
+                    <span class="badge bg-secondary">Alternative</span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ laptop.model }}</h5>
+                    
+                    <!-- Laptop categories -->
+                    <div class="mb-3">
+                        {% if laptop.suitable_for_gaming %}
+                        <span class="category-badge category-gaming">Gaming</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_business %}
+                        <span class="category-badge category-business">Business</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_students %}
+                        <span class="category-badge category-student">Student</span>
+                        {% endif %}
+                        {% if laptop.suitable_for_content_creation %}
+                        <span class="category-badge category-content">Content Creation</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Laptop specs -->
+                    <div class="laptop-specs">
+                        <div><strong>CPU:</strong> {{ laptop.cpu }}</div>
+                        <div><strong>GPU:</strong> {{ laptop.gpu }}</div>
+                        <div><strong>RAM:</strong> {{ laptop.ram }}GB</div>
+                        <div><strong>Display:</strong> {{ laptop.display_size }}" {{ laptop.display_resolution }}{% if laptop.display_refresh_rate %} @ {{ laptop.display_refresh_rate }}Hz{% endif %}</div>
+                    </div>
+                    
+                    <!-- Price & rating -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="price">${{ "%.2f"|format(laptop.price) }}</div>
+                        <div class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if laptop.user_rating and i < laptop.user_rating|int %}
+                                    <i class="fas fa-star"></i>
+                                {% elif laptop.user_rating and i < laptop.user_rating and i >= laptop.user_rating|int %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="btn-group w-100">
+                        <a href="{{ url_for('laptop_detail', laptop_id=laptop.id) }}" class="btn btn-primary flex-grow-1">
+                            <i class="fas fa-info-circle me-1"></i>View Details
+                        </a>
+                        <form method="POST" action="{{ url_for('add_to_favorites', laptop_id=laptop.id) }}">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Call to Action -->
+    <div class="text-center mt-5 mb-3">
+        <h3>Not what you're looking for?</h3>
+        <p class="lead">Let's refine your preferences to find a better match.</p>
+        <a href="{{ url_for('questionnaire') }}" class="btn btn-lg btn-outline-primary">
+            <i class="fas fa-redo me-2"></i>Try Again with Different Preferences
+        </a>
+        
+        <div class="mt-4">
+            <a href="{{ url_for('index') }}" class="btn btn-link">
+                <i class="fas fa-arrow-left me-2"></i>Return to Home
+            </a>
+            
+            {% if recommendations|length >= 2 %}
+            <a href="{{ url_for('comparison') }}?laptop_id={{ recommendations[0].id }}&laptop_id={{ recommendations[1].id }}{% if recommendations|length >= 3 %}&laptop_id={{ recommendations[2].id }}{% endif %}" class="btn btn-link">
+                <i class="fas fa-exchange-alt me-2"></i>Compare Recommendations
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,353 @@
+{% extends 'base.html' %}
+
+{% block title %}Find Your Perfect Laptop - AI Questionnaire{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="questionnaire-container">
+        <div class="questionnaire-title">
+            <h1 class="text-center mb-3">Find Your Perfect Laptop</h1>
+            <p class="text-center text-muted">Answer a few questions so our AI can recommend the best laptops for you</p>
+        </div>
+        
+        <!-- Progress bar -->
+        <div class="questionnaire-progress">
+            <div class="progress" style="height: 10px;">
+                <div class="progress-bar" role="progressbar" style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
+        
+        <!-- Questionnaire Form -->
+        <form method="POST" action="{{ url_for('submit_questionnaire') }}">
+            <!-- Step 1: Use Case -->
+            <div class="question-step active">
+                <h3>What will you primarily use your laptop for?</h3>
+                <p class="text-muted mb-4">This helps us understand your performance needs.</p>
+                
+                <div class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check card p-3 h-100">
+                                <input class="form-check-input" type="radio" name="use_case" id="use_case_gaming" value="gaming" required>
+                                <label class="form-check-label d-block" for="use_case_gaming">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-gamepad text-danger me-2"></i>
+                                        <strong>Gaming</strong>
+                                    </div>
+                                    <span class="text-muted">For playing modern games with good performance</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check card p-3 h-100">
+                                <input class="form-check-input" type="radio" name="use_case" id="use_case_business" value="business">
+                                <label class="form-check-label d-block" for="use_case_business">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-briefcase text-primary me-2"></i>
+                                        <strong>Business / Work</strong>
+                                    </div>
+                                    <span class="text-muted">For productivity tasks, documents, presentations, and video calls</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check card p-3 h-100">
+                                <input class="form-check-input" type="radio" name="use_case" id="use_case_student" value="student">
+                                <label class="form-check-label d-block" for="use_case_student">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-graduation-cap text-success me-2"></i>
+                                        <strong>Student</strong>
+                                    </div>
+                                    <span class="text-muted">For assignments, research, online learning, and general use</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check card p-3 h-100">
+                                <input class="form-check-input" type="radio" name="use_case" id="use_case_content" value="content_creation">
+                                <label class="form-check-label d-block" for="use_case_content">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-paint-brush text-info me-2"></i>
+                                        <strong>Content Creation</strong>
+                                    </div>
+                                    <span class="text-muted">For photo/video editing, graphic design, 3D modeling, etc.</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev invisible">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Budget -->
+            <div class="question-step">
+                <h3>What's your budget?</h3>
+                <p class="text-muted mb-4">We'll recommend laptops within your price range.</p>
+                
+                <div class="mb-4">
+                    <label for="budget_min" class="form-label">Minimum Budget</label>
+                    <input type="range" class="form-range" min="300" max="2000" step="100" id="budget_min" name="budget_min" value="500">
+                    <div class="d-flex justify-content-between">
+                        <span>$300</span>
+                        <span id="budget_min_value" class="fw-bold">$500</span>
+                        <span>$2000</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="budget_max" class="form-label">Maximum Budget</label>
+                    <input type="range" class="form-range" min="500" max="3000" step="100" id="budget_max" name="budget_max" value="1500">
+                    <div class="d-flex justify-content-between">
+                        <span>$500</span>
+                        <span id="budget_max_value" class="fw-bold">$1500</span>
+                        <span>$3000</span>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Performance Priorities -->
+            <div class="question-step">
+                <h3>How important is performance to you?</h3>
+                <p class="text-muted mb-4">This helps us prioritize CPU and GPU capabilities.</p>
+                
+                <div class="mb-4">
+                    <label for="priority_performance" class="form-label">Performance Priority</label>
+                    <input type="range" class="form-range priority-slider" min="1" max="5" step="1" id="priority_performance" name="priority_performance" value="3">
+                    <div class="slider-value" id="priority_performance_value">Important</div>
+                    <div class="range-labels">
+                        <span>Not Important</span>
+                        <span>Critical</span>
+                    </div>
+                </div>
+                
+                <!-- Gaming performance question (shown only if gaming is selected) -->
+                <div class="mb-4 gaming-only" style="display: none;">
+                    <label class="form-label">What level of gaming performance do you need?</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaming_level" id="gaming_casual" value="casual" checked>
+                        <label class="form-check-label" for="gaming_casual">
+                            <strong>Casual Gaming</strong> - Esports titles and older games
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaming_level" id="gaming_moderate" value="moderate">
+                        <label class="form-check-label" for="gaming_moderate">
+                            <strong>Moderate Gaming</strong> - Modern games at medium settings
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="gaming_level" id="gaming_intensive" value="intensive">
+                        <label class="form-check-label" for="gaming_intensive">
+                            <strong>Intensive Gaming</strong> - Latest AAA games at high settings
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 4: Portability & Battery -->
+            <div class="question-step">
+                <h3>How important is portability and battery life?</h3>
+                <p class="text-muted mb-4">Will you be carrying your laptop often or using it away from outlets?</p>
+                
+                <div class="mb-4">
+                    <label for="priority_portability" class="form-label">Portability Priority</label>
+                    <input type="range" class="form-range priority-slider" min="1" max="5" step="1" id="priority_portability" name="priority_portability" value="3">
+                    <div class="slider-value" id="priority_portability_value">Important</div>
+                    <div class="range-labels">
+                        <span>Not Important</span>
+                        <span>Critical</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="priority_battery" class="form-label">Battery Life Priority</label>
+                    <input type="range" class="form-range priority-slider" min="1" max="5" step="1" id="priority_battery" name="priority_battery" value="3">
+                    <div class="slider-value" id="priority_battery_value">Important</div>
+                    <div class="range-labels">
+                        <span>Not Important</span>
+                        <span>Critical</span>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Display & Storage -->
+            <div class="question-step">
+                <h3>Display and Storage preferences</h3>
+                <p class="text-muted mb-4">Help us understand your screen size and storage needs.</p>
+                
+                <div class="mb-4">
+                    <label for="priority_display" class="form-label">Display Quality Priority</label>
+                    <input type="range" class="form-range priority-slider" min="1" max="5" step="1" id="priority_display" name="priority_display" value="3">
+                    <div class="slider-value" id="priority_display_value">Important</div>
+                    <div class="range-labels">
+                        <span>Not Important</span>
+                        <span>Critical</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Preferred Display Size</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="display_size" id="display_small" value="small">
+                        <label class="form-check-label" for="display_small">
+                            Small (13" - 14") - More portable
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="display_size" id="display_medium" value="medium" checked>
+                        <label class="form-check-label" for="display_medium">
+                            Medium (15" - 15.6") - Balanced
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="display_size" id="display_large" value="large">
+                        <label class="form-check-label" for="display_large">
+                            Large (16" - 17.3") - Less portable, better immersion
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Minimum Storage Requirements</label>
+                    <select class="form-select" name="storage" id="storage">
+                        <option value="256">256GB</option>
+                        <option value="512" selected>512GB</option>
+                        <option value="1000">1TB</option>
+                        <option value="2000">2TB or more</option>
+                    </select>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 6: Build Quality -->
+            <div class="question-step">
+                <h3>Build Quality & Additional Factors</h3>
+                <p class="text-muted mb-4">Let's finalize your preferences.</p>
+                
+                <div class="mb-4">
+                    <label for="build_quality" class="form-label">Build Quality Priority</label>
+                    <input type="range" class="form-range priority-slider" min="1" max="5" step="1" id="build_quality" name="build_quality" value="3">
+                    <div class="slider-value" id="build_quality_value">Important</div>
+                    <div class="range-labels">
+                        <span>Not Important</span>
+                        <span>Critical</span>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Do you have any strong brand preferences?</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand_pref" id="brand_dell" value="Dell">
+                        <label class="form-check-label" for="brand_dell">Dell</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand_pref" id="brand_hp" value="HP">
+                        <label class="form-check-label" for="brand_hp">HP</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand_pref" id="brand_lenovo" value="Lenovo">
+                        <label class="form-check-label" for="brand_lenovo">Lenovo</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand_pref" id="brand_asus" value="ASUS">
+                        <label class="form-check-label" for="brand_asus">ASUS</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand_pref" id="brand_acer" value="Acer">
+                        <label class="form-check-label" for="brand_acer">Acer</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand_pref" id="brand_apple" value="Apple">
+                        <label class="form-check-label" for="brand_apple">Apple</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="brand_pref" id="brand_msi" value="MSI">
+                        <label class="form-check-label" for="brand_msi">MSI</label>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label">Any additional comments or requirements?</label>
+                    <textarea class="form-control" name="additional_comments" rows="3" placeholder="Optional: Any specific features or requirements not covered by the questions above."></textarea>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary btn-prev">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="submit" class="btn btn-success d-none" id="submit-questionnaire">
+                        <i class="fas fa-magic me-2"></i>Get Recommendations
+                    </button>
+                    <button type="button" class="btn btn-primary btn-next">
+                        Next<i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/questionnaire.js') }}"></script>
+<script>
+    // Show/hide gaming-specific questions based on use case selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const useCase = document.querySelectorAll('input[name="use_case"]');
+        const gamingOnly = document.querySelectorAll('.gaming-only');
+        
+        useCase.forEach(option => {
+            option.addEventListener('change', function() {
+                if (this.value === 'gaming') {
+                    gamingOnly.forEach(el => el.style.display = 'block');
+                } else {
+                    gamingOnly.forEach(el => el.style.display = 'none');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

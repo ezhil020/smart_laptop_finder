@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block title %}Laptop Comparison{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Laptop Comparison</h1>
+    
+    {% if laptops|length < 2 %}
+    <div class="alert alert-warning">
+        <p>You need at least two laptops to compare. Please select more laptops.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary mt-2">Browse Laptops</a>
+    </div>
+    {% else %}
+    
+    <!-- Comparison Table -->
+    <div class="table-responsive mb-5">
+        <table class="table comparison-table">
+            <thead>
+                <tr>
+                    <th scope="col">Specification</th>
+                    {% for laptop in laptops %}
+                    <th scope="col">
+                        <div class="text-center">
+                            <div class="fw-bold">{{ laptop.brand }}</div>
+                            <div>{{ laptop.model }}</div>
+                            <div class="price mt-2">${{ "%.2f"|format(laptop.price) }}</div>
+                        </div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Basic Specs -->
+                <tr class="spec-row" data-higher-better="false">
+                    <th scope="row">Price</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.price }}">
+                        ${{ "%.2f"|format(laptop.price) }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">CPU</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value">
+                        {{ laptop.cpu }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">GPU</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value">
+                        {{ laptop.gpu }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">RAM</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.ram }}">
+                        {{ laptop.ram }} GB
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">Storage</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.storage_capacity }}">
+                        {{ laptop.storage_capacity }} GB {{ laptop.storage_type }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Display Specs -->
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">Display Size</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.display_size }}">
+                        {{ laptop.display_size }}"
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">Display Resolution</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value">
+                        {{ laptop.display_resolution }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">Refresh Rate</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.display_refresh_rate or 60 }}">
+                        {{ laptop.display_refresh_rate or 60 }} Hz
+                    </td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Physical Specs -->
+                <tr class="spec-row" data-higher-better="false">
+                    <th scope="row">Weight</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.weight or 0 }}">
+                        {{ laptop.weight or 'N/A' }} {% if laptop.weight %}kg{% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">Battery Life</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.battery_life or 0 }}">
+                        {{ laptop.battery_life or 'N/A' }} {% if laptop.battery_life %}hours{% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row">
+                    <th scope="row">Operating System</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value">
+                        {{ laptop.operating_system or 'N/A' }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Performance Benchmarks -->
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">
+                        Cinebench Score
+                        <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="CPU benchmark score - higher is better"></i>
+                    </th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.cinebench_score or 0 }}">
+                        {{ laptop.cinebench_score or 'N/A' }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">
+                        Geekbench Score
+                        <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Multi-core performance benchmark - higher is better"></i>
+                    </th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.geekbench_score or 0 }}">
+                        {{ laptop.geekbench_score or 'N/A' }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">
+                        Gaming FPS
+                        <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Average FPS in modern games - higher is better"></i>
+                    </th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.gaming_fps or 0 }}">
+                        {{ laptop.gaming_fps or 'N/A' }} {% if laptop.gaming_fps %}FPS{% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Ratings & Value -->
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">User Rating</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.user_rating or 0 }}">
+                        <div class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if laptop.user_rating and i < laptop.user_rating|int %}
+                                    <i class="fas fa-star"></i>
+                                {% elif laptop.user_rating and i < laptop.user_rating and i >= laptop.user_rating|int %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div>{{ laptop.user_rating or 'N/A' }}/5</div>
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row" data-higher-better="true">
+                    <th scope="row">
+                        Price-Performance Ratio
+                        <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Value for money - higher is better"></i>
+                    </th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value" data-raw-value="{{ laptop.price_performance_ratio or 0 }}">
+                        {{ "%.2f"|format(laptop.price_performance_ratio) if laptop.price_performance_ratio else 'N/A' }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                <tr class="spec-row">
+                    <th scope="row">Build Quality</th>
+                    {% for laptop in laptops %}
+                    <td class="text-center spec-value">
+                        {{ laptop.build_quality or 'N/A' }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                
+                <!-- Action Buttons -->
+                <tr>
+                    <th scope="row"></th>
+                    {% for laptop in laptops %}
+                    <td class="text-center">
+                        <div class="btn-group d-flex">
+                            <a href="{{ url_for('laptop_detail', laptop_id=laptop.id) }}" class="btn btn-primary btn-sm">
+                                Details
+                            </a>
+                            <form method="POST" action="{{ url_for('add_to_favorites', laptop_id=laptop.id) }}">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Visualization Section -->
+    <div class="row g-4 mb-4">
+        <!-- Performance Radar Chart -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Performance Comparison</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="performanceChart" data-laptops="{{ laptops|tojson }}"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Price-Performance Chart -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Price vs. Performance</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="pricePerformanceChart" data-laptops="{{ laptops|tojson }}"></canvas>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Higher and to the left indicates better value for money
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Conclusion Section -->
+    <div class="card bg-dark mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Comparison Summary</h5>
+        </div>
+        <div class="card-body">
+            <p>Based on the specifications above, here's how these laptops compare:</p>
+            <ul>
+                {% set best_performance = namespace(laptop=None, score=0) %}
+                {% set best_value = namespace(laptop=None, score=0) %}
+                {% set best_battery = namespace(laptop=None, hours=0) %}
+                
+                {% for laptop in laptops %}
+                    {% if laptop.geekbench_score and laptop.geekbench_score > best_performance.score %}
+                        {% set best_performance.laptop = laptop %}
+                        {% set best_performance.score = laptop.geekbench_score %}
+                    {% endif %}
+                    
+                    {% if laptop.price_performance_ratio and laptop.price_performance_ratio > best_value.score %}
+                        {% set best_value.laptop = laptop %}
+                        {% set best_value.score = laptop.price_performance_ratio %}
+                    {% endif %}
+                    
+                    {% if laptop.battery_life and laptop.battery_life > best_battery.hours %}
+                        {% set best_battery.laptop = laptop %}
+                        {% set best_battery.hours = laptop.battery_life %}
+                    {% endif %}
+                {% endfor %}
+                
+                {% if best_performance.laptop %}
+                <li><strong>Best Performance:</strong> {{ best_performance.laptop.brand }} {{ best_performance.laptop.model }}</li>
+                {% endif %}
+                
+                {% if best_value.laptop %}
+                <li><strong>Best Value:</strong> {{ best_value.laptop.brand }} {{ best_value.laptop.model }}</li>
+                {% endif %}
+                
+                {% if best_battery.laptop %}
+                <li><strong>Best Battery Life:</strong> {{ best_battery.laptop.brand }} {{ best_battery.laptop.model }} ({{ best_battery.laptop.battery_life }} hours)</li>
+                {% endif %}
+            </ul>
+            
+            <p class="mb-0">
+                <i class="fas fa-star-half-alt text-warning me-2"></i>
+                <em>Remember that the best laptop depends on your specific needs and preferences.</em>
+            </p>
+        </div>
+    </div>
+    
+    <!-- Add to Comparison Section -->
+    <div class="text-center mt-4 mb-3">
+        <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+            <i class="fas fa-plus me-2"></i>Add More Laptops to Compare
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/comparison.js') }}"></script>
+{% endblock %}

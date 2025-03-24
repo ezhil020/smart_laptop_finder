@@ -14,16 +14,17 @@ def index():
     if 'user_session_id' not in session:
         session['user_session_id'] = str(uuid.uuid4())
     
-    # Get some featured laptops for the home page
-    laptops = Laptop.query.order_by(Laptop.user_rating.desc()).limit(6).all()
-    
-    # Get categories for filtering
-    categories = {
-        'gaming': Laptop.query.filter_by(suitable_for_gaming=True).count(),
-        'business': Laptop.query.filter_by(suitable_for_business=True).count(),
-        'student': Laptop.query.filter_by(suitable_for_students=True).count(),
-        'content_creation': Laptop.query.filter_by(suitable_for_content_creation=True).count()
-    }
+    with app.app_context():
+        # Get some featured laptops for the home page
+        laptops = Laptop.query.order_by(Laptop.user_rating.desc()).limit(6).all()
+        
+        # Get categories for filtering
+        categories = {
+            'gaming': Laptop.query.filter_by(suitable_for_gaming=True).count(),
+            'business': Laptop.query.filter_by(suitable_for_business=True).count(),
+            'student': Laptop.query.filter_by(suitable_for_students=True).count(),
+            'content_creation': Laptop.query.filter_by(suitable_for_content_creation=True).count()
+        }
     
     return render_template('index.html', laptops=laptops, categories=categories)
 
@@ -35,13 +36,14 @@ def search():
     if not query:
         return redirect(url_for('index'))
     
-    # Search laptops by brand or model
-    laptops = Laptop.query.filter(
-        or_(
-            Laptop.brand.ilike(f'%{query}%'),
-            Laptop.model.ilike(f'%{query}%')
-        )
-    ).all()
+    with app.app_context():
+        # Search laptops by brand or model
+        laptops = Laptop.query.filter(
+            or_(
+                Laptop.brand.ilike(f'%{query}%'),
+                Laptop.model.ilike(f'%{query}%')
+            )
+        ).all()
     
     return render_template('index.html', laptops=laptops, search_query=query)
 
@@ -70,84 +72,88 @@ def submit_questionnaire():
     priority_display = int(request.form.get('priority_display', 3))
     priority_portability = int(request.form.get('priority_portability', 3))
     
-    # Create user preference object
-    user_pref = UserPreference(
-        session_id=session_id,
-        budget_min=budget_min,
-        budget_max=budget_max,
-        use_case_gaming=(use_case == 'gaming'),
-        use_case_business=(use_case == 'business'),
-        use_case_student=(use_case == 'student'),
-        use_case_content_creation=(use_case == 'content_creation'),
-        priority_cpu_performance=priority_performance,
-        priority_gpu_performance=priority_performance if use_case == 'gaming' or use_case == 'content_creation' else 2,
-        preferred_display_size='Large' if priority_display >= 4 else 'Medium',
-        battery_life_importance=priority_battery,
-        build_quality_importance=int(request.form.get('build_quality', 3))
-    )
-    
-    # Save user preferences
-    db.session.add(user_pref)
-    db.session.commit()
-    
-    # Create a user preferences dictionary for the ML model
-    user_prefs_dict = {
-        'use_case': use_case,
-        'budget_min': budget_min,
-        'budget_max': budget_max,
-        'performance_priority': priority_performance,
-        'battery_priority': priority_battery,
-        'display_priority': priority_display,
-        'portability_priority': priority_portability
-    }
-    
-    # Get recommendations from ML model
-    recommended_ids = laptop_recommender.recommend_laptops(user_prefs_dict, limit=3)
-    
-    # Redirect to results page
-    return redirect(url_for('results', pref_id=user_pref.id))
+    with app.app_context():
+        # Create user preference object
+        user_pref = UserPreference(
+            session_id=session_id,
+            budget_min=budget_min,
+            budget_max=budget_max,
+            use_case_gaming=(use_case == 'gaming'),
+            use_case_business=(use_case == 'business'),
+            use_case_student=(use_case == 'student'),
+            use_case_content_creation=(use_case == 'content_creation'),
+            priority_cpu_performance=priority_performance,
+            priority_gpu_performance=priority_performance if use_case == 'gaming' or use_case == 'content_creation' else 2,
+            preferred_display_size='Large' if priority_display >= 4 else 'Medium',
+            battery_life_importance=priority_battery,
+            build_quality_importance=int(request.form.get('build_quality', 3))
+        )
+        
+        # Save user preferences
+        db.session.add(user_pref)
+        db.session.commit()
+        
+        # Create a user preferences dictionary for the ML model
+        user_prefs_dict = {
+            'use_case': use_case,
+            'budget_min': budget_min,
+            'budget_max': budget_max,
+            'performance_priority': priority_performance,
+            'battery_priority': priority_battery,
+            'display_priority': priority_display,
+            'portability_priority': priority_portability
+        }
+        
+        # Get recommendations from ML model
+        recommended_ids = laptop_recommender.recommend_laptops(user_prefs_dict, limit=3)
+        
+        # Redirect to results page
+        return redirect(url_for('results', pref_id=user_pref.id))
 
 @app.route('/results/<int:pref_id>')
 def results(pref_id):
     """Display the recommendation results"""
-    # Get the user preference
-    user_pref = UserPreference.query.get_or_404(pref_id)
-    
-    # Create user preferences dictionary for the ML model
-    user_prefs_dict = {
-        'use_case': 'gaming' if user_pref.use_case_gaming else 
-                   'business' if user_pref.use_case_business else
-                   'student' if user_pref.use_case_student else
-                   'content_creation' if user_pref.use_case_content_creation else 'general',
-        'budget_min': user_pref.budget_min,
-        'budget_max': user_pref.budget_max,
-        'performance_priority': user_pref.priority_cpu_performance,
-        'battery_priority': user_pref.battery_life_importance
-    }
-    
-    # Get recommendations
-    recommended_ids = laptop_recommender.recommend_laptops(user_prefs_dict, limit=3)
-    recommended_laptops = Laptop.query.filter(Laptop.id.in_(recommended_ids)).all()
-    
-    # If we don't have enough recommendations, get some based on best value
-    if len(recommended_laptops) < 3:
-        use_case = user_prefs_dict['use_case']
-        value_ids = laptop_recommender.get_value_recommendations(
-            budget=user_pref.budget_max,
-            use_case=use_case,
-            limit=3-len(recommended_laptops)
-        )
-        value_laptops = Laptop.query.filter(
-            Laptop.id.in_(value_ids),
-            ~Laptop.id.in_(recommended_ids)  # Exclude already recommended laptops
-        ).all()
-        recommended_laptops.extend(value_laptops)
-    
-    # Get alternative suggestions
-    alternatives = []
-    if recommended_laptops:
-        similar_ids = laptop_recommender.find_similar_laptops(recommended_laptops[0].id, limit=2)
-        alternatives = Laptop.query.filter(Laptop.id.in_(similar_ids)).all()
+    with app.app_context():
+        # Get the user preference
+        user_pref = UserPreference.query.get_or_404(pref_id)
+        
+        # Create user preferences dictionary for the ML model
+        user_prefs_dict = {
+            'use_case': 'gaming' if user_pref.use_case_gaming else 
+                      'business' if user_pref.use_case_business else
+                      'student' if user_pref.use_case_student else
+                      'content_creation' if user_pref.use_case_content_creation else 'general',
+            'budget_min': user_pref.budget_min,
+            'budget_max': user_pref.budget_max,
+            'performance_priority': user_pref.priority_cpu_performance,
+            'battery_priority': user_pref.battery_life_importance
+        }
+        
+        # Get recommendations
+        recommended_ids = laptop_recommender.recommend_laptops(user_prefs_dict, limit=3)
+        
+        recommended_laptops = Laptop.query.filter(Laptop.id.in_(recommended_ids)).all() if recommended_ids else []
+        
+        # If we don't have enough recommendations, get some based on best value
+        if len(recommended_laptops) < 3:
+            use_case = user_prefs_dict['use_case']
+            value_ids = laptop_recommender.get_value_recommendations(
+                budget=user_pref.budget_max,
+                use_case=use_case,
+                limit=3-len(recommended_laptops)
+            )
+            if value_ids:
+                value_laptops = Laptop.query.filter(
+                    Laptop.id.in_(value_ids),
+                    ~Laptop.id.in_(recommended_ids) if recommended_ids else True  # Exclude already recommended laptops
+                ).all()
+                recommended_laptops.extend(value_laptops)
+        
+        # Get alternative suggestions
+        alternatives = []
+        if recommended_laptops:
+            similar_ids = laptop_recommender.find_similar_laptops(recommended_laptops[0].id, limit=2)
+            alternatives = Laptop.query.filter(Laptop.id.in_(similar_ids)).all() if similar_ids else []
     
     return render_template(
         'results.html',
@@ -159,19 +165,20 @@ def results(pref_id):
 @app.route('/laptop/<int:laptop_id>')
 def laptop_detail(laptop_id):
     """Display details of a specific laptop"""
-    laptop = Laptop.query.get_or_404(laptop_id)
-    
-    # Get similar laptops
-    similar_ids = laptop_recommender.find_similar_laptops(laptop_id, limit=3)
-    similar_laptops = Laptop.query.filter(Laptop.id.in_(similar_ids)).all()
-    
-    # Check if laptop is in user's favorites
-    is_favorite = False
-    if 'user_session_id' in session:
-        is_favorite = Favorite.query.filter_by(
-            session_id=session['user_session_id'],
-            laptop_id=laptop_id
-        ).first() is not None
+    with app.app_context():
+        laptop = Laptop.query.get_or_404(laptop_id)
+        
+        # Get similar laptops
+        similar_ids = laptop_recommender.find_similar_laptops(laptop_id, limit=3)
+        similar_laptops = Laptop.query.filter(Laptop.id.in_(similar_ids)).all() if similar_ids else []
+        
+        # Check if laptop is in user's favorites
+        is_favorite = False
+        if 'user_session_id' in session:
+            is_favorite = Favorite.query.filter_by(
+                session_id=session['user_session_id'],
+                laptop_id=laptop_id
+            ).first() is not None
     
     return render_template(
         'laptop_detail.html',
@@ -190,8 +197,9 @@ def comparison():
     if not laptop_ids:
         return redirect(url_for('index'))
     
-    # Get the laptops
-    laptops = Laptop.query.filter(Laptop.id.in_(laptop_ids)).all()
+    with app.app_context():
+        # Get the laptops
+        laptops = Laptop.query.filter(Laptop.id.in_(laptop_ids)).all() if laptop_ids else []
     
     # Get specs to compare
     specs = [
@@ -223,23 +231,24 @@ def add_to_favorites(laptop_id):
     
     session_id = session['user_session_id']
     
-    # Check if laptop exists
-    laptop = Laptop.query.get_or_404(laptop_id)
-    
-    # Check if already in favorites
-    existing = Favorite.query.filter_by(
-        session_id=session_id,
-        laptop_id=laptop_id
-    ).first()
-    
-    if not existing:
-        # Add to favorites
-        favorite = Favorite(session_id=session_id, laptop_id=laptop_id)
-        db.session.add(favorite)
-        db.session.commit()
-        flash('Laptop added to favorites!', 'success')
-    else:
-        flash('Laptop already in favorites!', 'info')
+    with app.app_context():
+        # Check if laptop exists
+        laptop = Laptop.query.get_or_404(laptop_id)
+        
+        # Check if already in favorites
+        existing = Favorite.query.filter_by(
+            session_id=session_id,
+            laptop_id=laptop_id
+        ).first()
+        
+        if not existing:
+            # Add to favorites
+            favorite = Favorite(session_id=session_id, laptop_id=laptop_id)
+            db.session.add(favorite)
+            db.session.commit()
+            flash('Laptop added to favorites!', 'success')
+        else:
+            flash('Laptop already in favorites!', 'info')
     
     # Redirect back to laptop detail page
     return redirect(url_for('laptop_detail', laptop_id=laptop_id))
@@ -252,16 +261,17 @@ def remove_from_favorites(laptop_id):
     
     session_id = session['user_session_id']
     
-    # Find and delete the favorite
-    favorite = Favorite.query.filter_by(
-        session_id=session_id,
-        laptop_id=laptop_id
-    ).first()
-    
-    if favorite:
-        db.session.delete(favorite)
-        db.session.commit()
-        flash('Laptop removed from favorites!', 'success')
+    with app.app_context():
+        # Find and delete the favorite
+        favorite = Favorite.query.filter_by(
+            session_id=session_id,
+            laptop_id=laptop_id
+        ).first()
+        
+        if favorite:
+            db.session.delete(favorite)
+            db.session.commit()
+            flash('Laptop removed from favorites!', 'success')
     
     # Redirect back to laptop detail page
     return redirect(url_for('laptop_detail', laptop_id=laptop_id))
@@ -275,12 +285,13 @@ def favorites():
     
     session_id = session['user_session_id']
     
-    # Get user's favorites
-    favorites = Favorite.query.filter_by(session_id=session_id).all()
-    
-    # Get the corresponding laptops
-    laptop_ids = [fav.laptop_id for fav in favorites]
-    laptops = Laptop.query.filter(Laptop.id.in_(laptop_ids)).all()
+    with app.app_context():
+        # Get user's favorites
+        favorites = Favorite.query.filter_by(session_id=session_id).all()
+        
+        # Get the corresponding laptops
+        laptop_ids = [fav.laptop_id for fav in favorites]
+        laptops = Laptop.query.filter(Laptop.id.in_(laptop_ids)).all() if laptop_ids else []
     
     return render_template('favorites.html', favorites=laptops)
 

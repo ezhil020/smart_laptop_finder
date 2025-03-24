@@ -298,32 +298,33 @@ def favorites():
 @app.route('/api/laptop/<int:laptop_id>')
 def api_laptop_detail(laptop_id):
     """API endpoint to get laptop details"""
-    laptop = Laptop.query.get_or_404(laptop_id)
-    
-    # Convert laptop to dictionary
-    laptop_dict = {
-        'id': laptop.id,
-        'brand': laptop.brand,
-        'model': laptop.model,
-        'price': laptop.price,
-        'cpu': laptop.cpu,
-        'gpu': laptop.gpu,
-        'ram': laptop.ram,
-        'storage_type': laptop.storage_type,
-        'storage_capacity': laptop.storage_capacity,
-        'display_size': laptop.display_size,
-        'display_resolution': laptop.display_resolution,
-        'display_refresh_rate': laptop.display_refresh_rate,
-        'weight': laptop.weight,
-        'battery_life': laptop.battery_life,
-        'operating_system': laptop.operating_system,
-        'cinebench_score': laptop.cinebench_score,
-        'geekbench_score': laptop.geekbench_score,
-        'gaming_fps': laptop.gaming_fps,
-        'user_rating': laptop.user_rating,
-        'build_quality': laptop.build_quality,
-        'value_category': laptop.value_category,
-        'price_performance_ratio': laptop.price_performance_ratio
-    }
+    with app.app_context():
+        laptop = Laptop.query.get_or_404(laptop_id)
+        
+        # Convert laptop to dictionary
+        laptop_dict = {
+            'id': laptop.id,
+            'brand': laptop.brand,
+            'model': laptop.model,
+            'price': laptop.price,
+            'cpu': laptop.cpu,
+            'gpu': laptop.gpu,
+            'ram': laptop.ram,
+            'storage_type': laptop.storage_type,
+            'storage_capacity': laptop.storage_capacity,
+            'display_size': laptop.display_size,
+            'display_resolution': laptop.display_resolution,
+            'display_refresh_rate': laptop.display_refresh_rate,
+            'weight': laptop.weight,
+            'battery_life': laptop.battery_life,
+            'operating_system': laptop.operating_system,
+            'cinebench_score': laptop.cinebench_score,
+            'geekbench_score': laptop.geekbench_score,
+            'gaming_fps': laptop.gaming_fps,
+            'user_rating': laptop.user_rating,
+            'build_quality': laptop.build_quality,
+            'value_category': laptop.value_category,
+            'price_performance_ratio': laptop.price_performance_ratio
+        }
     
     return jsonify(laptop_dict)

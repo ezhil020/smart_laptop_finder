@@ -147,18 +147,18 @@ class LaptopRecommender:
 
 
                     # Apply brand filtering if preferences exist
-                    brand_prefs = user_preferences.get('brand_pref', [])
-                    if brand_prefs:
-                        filtered_laptops = Laptop.query.filter(
-                            Laptop.id.in_(top_laptop_ids),
-                            Laptop.price <= budget_max,
-                            Laptop.brand.in_(brand_prefs)
-                        ).all()
-                    else:
-                        filtered_laptops = Laptop.query.filter(
-                            Laptop.id.in_(top_laptop_ids),
-                            Laptop.price <= budget_max
-                        ).all()
+                brand_prefs = user_preferences.get('brand_pref', [])
+                if brand_prefs:
+                    filtered_laptops = Laptop.query.filter(
+                        Laptop.id.in_(top_laptop_ids),
+                        Laptop.price <= budget_max,
+                        Laptop.brand.in_(brand_prefs)
+                    ).all()
+                else:
+                    filtered_laptops = Laptop.query.filter(
+                        Laptop.id.in_(top_laptop_ids),
+                        Laptop.price <= budget_max
+                    ).all()
                 
                 filtered_laptops = Laptop.query.filter(
                     Laptop.id.in_(top_laptop_ids),

@@ -39,10 +39,8 @@ def import_laptops_from_csv(csv_path):
                     model = str(row['name']).strip() if pd.notna(row['name']) else "Unknown Model"
                     model = model[:500]  # Limit to 500 chars
                     
-                    # Convert price (assuming in Rupees) to dollars for consistency
-                    # Using a rough conversion rate of 75 INR = 1 USD
-                    price_inr = float(row['Price (in Indian Rupees)']) if pd.notna(row['Price (in Indian Rupees)']) else 0
-                    price_usd = price_inr / 75.0
+                    # Keep price in rupees
+                    price = float(row['Price (in Indian Rupees)']) if pd.notna(row['Price (in Indian Rupees)']) else 0
                     
                     # Extract CPU and GPU info
                     cpu = str(row['Processor name']).strip() if pd.notna(row['Processor name']) else "Unknown CPU"
@@ -89,9 +87,9 @@ def import_laptops_from_csv(csv_path):
                     build_quality = build_quality[:100]  # Limit to 100 chars
                     
                     # Price category based on price
-                    if price_usd < 500:
+                    if price < 40000:
                         value_category = "Budget"
-                    elif price_usd < 1000:
+                    elif price < 80000:
                         value_category = "Mid-Range"
                     else:
                         value_category = "High-End"

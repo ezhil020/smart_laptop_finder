@@ -327,7 +327,7 @@
             <!-- Price Card -->
             <div class="card mb-4 bg-primary bg-opacity-10">
                 <div class="card-body text-center">
-                    <h3 class="price-tag">${{ "%.2f"|format(laptop.price) }}</h3>
+                    <h3 class="price-tag">₹{{ "{:,.0f}"|format(laptop.price) }}</h3>
                     <p class="lead mb-4">{{ laptop.value_category }}</p>
                     
                     {% if is_favorite %}

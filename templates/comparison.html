@@ -24,7 +24,7 @@
                         <div class="text-center">
                             <div class="fw-bold">{{ laptop.brand }}</div>
                             <div>{{ laptop.model }}</div>
-                            <div class="price mt-2">${{ "%.2f"|format(laptop.price) }}</div>
+                            <div class="price mt-2">₹{{ "{:,.0f}"|format(laptop.price) }}</div>
                         </div>
                     </th>
                     {% endfor %}

@@ -51,6 +51,30 @@ class Laptop(db.Model):
     
     def __repr__(self):
         return f"<Laptop {self.brand} {self.model}>"
+        
+def to_dict(self):
+    return {
+        'id': self.id,
+        'brand': self.brand,
+        'model': self.model,
+        'price': self.price,
+        'cpu': self.cpu,
+        'gpu': self.gpu,
+        'ram': self.ram,
+        'storage_type': self.storage_type,
+        'storage_capacity': self.storage_capacity,
+        'display_size': self.display_size,
+        'display_resolution': self.display_resolution,
+        'display_refresh_rate': self.display_refresh_rate,
+        'weight': self.weight,
+        'battery_life': self.battery_life,
+        'cinebench_score': self.cinebench_score,
+        'geekbench_score': self.geekbench_score,
+        'gaming_fps': self.gaming_fps,
+        'user_rating': self.user_rating,
+        'build_quality': self.build_quality,
+        'price_performance_ratio': self.price_performance_ratio
+    }
 
 # UserPreference model to store questionnaire responses
 class UserPreference(db.Model):

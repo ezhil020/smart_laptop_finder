@@ -11,7 +11,7 @@
             <li class="breadcrumb-item active" aria-current="page">{{ laptop.brand }} {{ laptop.model }}</li>
         </ol>
     </nav>
-    
+
     <!-- Laptop Detail -->
     <div class="row">
         <!-- Left Column: Main Info -->
@@ -19,7 +19,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h1 class="card-title mb-1">{{ laptop.brand }} {{ laptop.model }}</h1>
-                    
+
                     <!-- Categories -->
                     <div class="mb-3">
                         {% if laptop.suitable_for_gaming %}
@@ -38,7 +38,7 @@
                             {{ laptop.value_category }}
                         </span>
                     </div>
-                    
+
                     <!-- Rating -->
                     <div class="d-flex align-items-center mb-4">
                         <div class="rating-stars me-2">
@@ -54,7 +54,7 @@
                         </div>
                         <span class="text-muted">{{ laptop.user_rating }}/5 User Rating</span>
                     </div>
-                    
+
                     <div class="row mb-4">
                         <!-- Performance Highlights -->
                         <div class="col-md-6">
@@ -158,7 +158,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Core Specifications -->
                         <div class="col-md-6">
                             <h4 class="mb-3">Core Specifications</h4>
@@ -192,7 +192,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Buttons -->
                     <div class="d-flex flex-wrap gap-2">
                         {% if is_favorite %}
@@ -208,7 +208,7 @@
                             </button>
                         </form>
                         {% endif %}
-                        
+
                         <button class="btn btn-outline-primary add-to-compare" data-laptop-id="{{ laptop.id }}">
                             <i class="fas fa-plus me-2"></i>Add to Comparison
                         </button>
@@ -221,7 +221,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Benchmark Section -->
             <div class="benchmark-section card mb-4">
                 <div class="card-header">
@@ -251,7 +251,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Benchmark Chart -->
                     <div class="mt-4">
                         <canvas id="benchmarkChart" 
@@ -266,7 +266,7 @@
                     </small>
                 </div>
             </div>
-            
+
             <!-- Value Analysis Section -->
             <div class="price-section card mb-4">
                 <div class="card-header">
@@ -276,7 +276,7 @@
                     <div class="row align-items-center mb-4">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <div class="text-center">
-                                <div class="price-tag mb-2">${{ "%.2f"|format(laptop.price) }}</div>
+                                <div class="price-tag mb-2">₹{{ "{:,.0f}"|format(laptop.price) }}</div>
                                 <div class="text-muted">
                                     {% if laptop.value_category == 'Budget' %}
                                     <span class="badge bg-success">Budget-Friendly</span>
@@ -305,7 +305,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Value Chart -->
                     <div class="mt-4">
                         <canvas id="valueChart" 
@@ -321,7 +321,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Right Column: Sidebar -->
         <div class="col-lg-4">
             <!-- Price Card -->
@@ -329,7 +329,7 @@
                 <div class="card-body text-center">
                     <h3 class="price-tag">₹{{ "{:,.0f}"|format(laptop.price) }}</h3>
                     <p class="lead mb-4">{{ laptop.value_category }}</p>
-                    
+
                     {% if is_favorite %}
                     <form method="POST" action="{{ url_for('remove_from_favorites', laptop_id=laptop.id) }}" class="mb-3">
                         <button type="submit" class="btn btn-danger w-100">
@@ -343,11 +343,11 @@
                         </button>
                     </form>
                     {% endif %}
-                    
+
                     <button class="btn btn-outline-primary w-100 add-to-compare mb-2" data-laptop-id="{{ laptop.id }}">
                         <i class="fas fa-exchange-alt me-2"></i>Add to Comparison
                     </button>
-                    
+
                     {% if laptop.product_url %}
                     <a href="{{ url_for('laptop_redirect', laptop_id=laptop.id) }}" class="btn btn-success w-100" target="_blank">
                         <i class="fas fa-shopping-cart me-2"></i>Buy Now
@@ -355,7 +355,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Best Suited For -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -377,7 +377,7 @@
                             {% endif %}
                         </li>
                         {% endif %}
-                        
+
                         {% if laptop.suitable_for_business %}
                         <li class="list-group-item bg-transparent">
                             <i class="fas fa-briefcase text-primary me-2"></i> Business/Professional
@@ -392,7 +392,7 @@
                             {% endif %}
                         </li>
                         {% endif %}
-                        
+
                         {% if laptop.suitable_for_students %}
                         <li class="list-group-item bg-transparent">
                             <i class="fas fa-graduation-cap text-success me-2"></i> Student
@@ -405,7 +405,7 @@
                             {% endif %}
                         </li>
                         {% endif %}
-                        
+
                         {% if laptop.suitable_for_content_creation %}
                         <li class="list-group-item bg-transparent">
                             <i class="fas fa-paint-brush text-info me-2"></i> Content Creation
@@ -420,7 +420,7 @@
                             {% endif %}
                         </li>
                         {% endif %}
-                        
+
                         {% if not laptop.suitable_for_gaming and not laptop.suitable_for_business and not laptop.suitable_for_students and not laptop.suitable_for_content_creation %}
                         <li class="list-group-item bg-transparent">
                             <i class="fas fa-laptop text-secondary me-2"></i> General Use
@@ -429,7 +429,7 @@
                     </ul>
                 </div>
             </div>
-            
+
             <!-- Similar Laptops -->
             <div class="card mb-4">
                 <div class="card-header">
@@ -441,7 +441,7 @@
                         <a href="{{ url_for('laptop_detail', laptop_id=similar.id) }}" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between align-items-center">
                                 <h6 class="mb-1">{{ similar.brand }} {{ similar.model }}</h6>
-                                <span class="price">${{ "%.2f"|format(similar.price) }}</span>
+                                <span class="price">₹{{ "{:,.0f}"|format(similar.price) }}</span>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <small class="text-muted">

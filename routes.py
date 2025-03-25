@@ -203,8 +203,8 @@ def laptop_detail(laptop_id):
     return render_template(
         'laptop_detail.html',
         laptop=laptop,
-        laptop_json=laptop_features,
-        similar_laptops=similar_laptops,
+        laptop_json=laptop.to_dict(),
+        similar_laptops=[l.to_dict() for l in similar_laptops],
         is_favorite=is_favorite
     )
 
@@ -214,7 +214,7 @@ def laptop_redirect(laptop_id):
     with app.app_context():
         laptop = Laptop.query.get_or_404(laptop_id)
         
-        if laptop.product_url:
+        if laptop.product_url and laptop.product_url.strip():
             return redirect(laptop.product_url)
         else:
             flash('No product link available for this laptop', 'warning')
@@ -253,7 +253,8 @@ def comparison():
         {'name': 'User Rating', 'key': 'user_rating', 'unit': '/5', 'is_higher_better': True}
     ]
     
-    return render_template('comparison.html', laptops=laptops, specs=specs)
+    laptop_dicts = [laptop.to_dict() for laptop in laptops]
+    return render_template('comparison.html', laptops=laptop_dicts, specs=specs)
 
 @app.route('/add_to_favorites/<int:laptop_id>', methods=['POST'])
 def add_to_favorites(laptop_id):

@@ -149,23 +149,15 @@ class LaptopRecommender:
                     # Apply brand filtering if preferences exist
                 brand_prefs = user_preferences.get('brand_pref', [])
                 if brand_prefs and len(brand_prefs) > 0:
-                    # Get laptops with exact brand match first
-                    filtered_laptops = []
-                    all_laptops = Laptop.query.filter(
+                    filtered_laptops = Laptop.query.filter(
                         Laptop.id.in_(top_laptop_ids),
-                        Laptop.price <= budget_max
+                        Laptop.price <= budget_max,
+                        Laptop.brand.in_([b.title() for b in brand_prefs])
                     ).all()
                     
-                    # Prioritize exact brand matches
-                    for laptop in all_laptops:
-                        if any(brand.lower() == laptop.brand.lower() for brand in brand_prefs):
-                            filtered_laptops.append(laptop)
-                            
-                    # If we don't have enough matches, include similar brands
-                    if len(filtered_laptops) < limit:
-                        for laptop in all_laptops:
-                            if laptop not in filtered_laptops and any(brand.lower() in laptop.brand.lower() for brand in brand_prefs):
-                                filtered_laptops.append(laptop)
+                    # If we have matches with brand preference, return them
+                    if filtered_laptops:
+                        return [laptop.id for laptop in filtered_laptops[:limit]]
                 else:
                     filtered_laptops = Laptop.query.filter(
                         Laptop.id.in_(top_laptop_ids),

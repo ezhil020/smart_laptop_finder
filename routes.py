@@ -204,7 +204,7 @@ def laptop_detail(laptop_id):
         'laptop_detail.html',
         laptop=laptop,
         laptop_json=laptop.to_dict(),
-        similar_laptops=[l.to_dict() for l in similar_laptops],
+        similar_laptops=[l.to_dict() for l in similar_laptops] if similar_laptops else [],
         is_favorite=is_favorite
     )
 
@@ -236,7 +236,7 @@ def comparison():
     
     # Get specs to compare
     specs = [
-        {'name': 'Price', 'key': 'price', 'unit': '$', 'is_higher_better': False},
+        {'name': 'Price', 'key': 'price', 'unit': '₹', 'is_higher_better': False},
         {'name': 'CPU', 'key': 'cpu', 'unit': '', 'is_higher_better': True},
         {'name': 'GPU', 'key': 'gpu', 'unit': '', 'is_higher_better': True},
         {'name': 'RAM', 'key': 'ram', 'unit': 'GB', 'is_higher_better': True},

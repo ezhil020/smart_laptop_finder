@@ -133,7 +133,7 @@ class LaptopRecommender:
             
             # Get top matches
             top_indices = similarity_scores.argsort()[-limit*2:][::-1]  # Get twice as many for filtering
-            top_laptop_ids = [self.laptop_ids[i] for i in top_indices]
+            top_laptop_ids = [int(self.laptop_ids[i]) for i in top_indices]
             
             # Filter by budget if specified
             if user_preferences.get('budget_max'):
@@ -187,8 +187,8 @@ class LaptopRecommender:
         # Remove the reference laptop from results
         top_indices = [idx for idx in top_indices if self.laptop_ids[idx] != laptop_id]
         
-        # Get laptop IDs
-        similar_laptop_ids = [self.laptop_ids[i] for i in top_indices[:limit]]
+        # Get laptop IDs and convert numpy types to native Python types
+        similar_laptop_ids = [int(self.laptop_ids[i]) for i in top_indices[:limit]]
         
         return similar_laptop_ids
     

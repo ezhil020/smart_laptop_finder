@@ -93,8 +93,10 @@ class LaptopRecommender:
         
         # Train K-Means for laptop clustering by price-performance
         kmeans_features = ['price', 'cinebench_score', 'geekbench_score', 'gaming_fps', 'price_performance_ratio']
+        # Create a separate scaler for kmeans features to avoid dimension mismatch
+        kmeans_scaler = StandardScaler()
         self.kmeans = KMeans(n_clusters=3, random_state=42)
-        self.kmeans.fit(self.scaler.transform(df[kmeans_features]))
+        self.kmeans.fit(kmeans_scaler.fit_transform(df[kmeans_features]))
         
         logging.info("ML models successfully initialized!")
     
@@ -132,8 +134,12 @@ class LaptopRecommender:
             similarity_scores = cosine_similarity(user_vector_scaled, self.laptop_features)[0]
             
             # Get top matches
-            top_indices = similarity_scores.argsort()[-limit*2:][::-1]  # Get twice as many for filtering
-            top_laptop_ids = [int(self.laptop_ids[i]) for i in top_indices]
+            if len(similarity_scores) > 0:
+                top_indices = similarity_scores.argsort()[-limit*2:][::-1]  # Get twice as many for filtering
+                top_laptop_ids = [int(self.laptop_ids[i]) for i in top_indices]
+            else:
+                logging.warning("No similarity scores calculated")
+                return []
             
             # Filter by budget if specified
             if user_preferences.get('budget_max'):
@@ -182,13 +188,17 @@ class LaptopRecommender:
         similarity_scores = cosine_similarity(ref_features, self.laptop_features)[0]
         
         # Get top matches (excluding the reference laptop itself)
-        top_indices = similarity_scores.argsort()[-(limit+1):][::-1]
-        
-        # Remove the reference laptop from results
-        top_indices = [idx for idx in top_indices if self.laptop_ids[idx] != laptop_id]
-        
-        # Get laptop IDs and convert numpy types to native Python types
-        similar_laptop_ids = [int(self.laptop_ids[i]) for i in top_indices[:limit]]
+        if len(similarity_scores) > 0:
+            top_indices = similarity_scores.argsort()[-(limit+1):][::-1]
+            
+            # Remove the reference laptop from results
+            top_indices = [idx for idx in top_indices if self.laptop_ids[idx] != laptop_id]
+            
+            # Get laptop IDs and convert numpy types to native Python types
+            similar_laptop_ids = [int(self.laptop_ids[i]) for i in top_indices[:limit]]
+        else:
+            logging.warning("No similarity scores calculated for similar laptop finding")
+            return []
         
         return similar_laptop_ids
     

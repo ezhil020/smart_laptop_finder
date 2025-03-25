@@ -212,6 +212,12 @@
                         <button class="btn btn-outline-primary add-to-compare" data-laptop-id="{{ laptop.id }}">
                             <i class="fas fa-plus me-2"></i>Add to Comparison
                         </button>
+
+                        {% if laptop.product_url %}
+                        <a href="{{ url_for('laptop_redirect', laptop_id=laptop.id) }}" class="btn btn-success" target="_blank">
+                            <i class="fas fa-shopping-cart me-2"></i>Buy Now
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -249,7 +255,7 @@
                     <!-- Benchmark Chart -->
                     <div class="mt-4">
                         <canvas id="benchmarkChart" 
-                                data-laptop="{{ laptop|tojson }}" 
+                                data-laptop="{{ laptop_json|tojson }}" 
                                 data-similar-laptops="{{ similar_laptops|tojson }}"></canvas>
                     </div>
                 </div>
@@ -303,7 +309,7 @@
                     <!-- Value Chart -->
                     <div class="mt-4">
                         <canvas id="valueChart" 
-                                data-laptop="{{ laptop|tojson }}" 
+                                data-laptop="{{ laptop_json|tojson }}" 
                                 data-similar-laptops="{{ similar_laptops|tojson }}"></canvas>
                     </div>
                 </div>
@@ -341,6 +347,12 @@
                     <button class="btn btn-outline-primary w-100 add-to-compare mb-2" data-laptop-id="{{ laptop.id }}">
                         <i class="fas fa-exchange-alt me-2"></i>Add to Comparison
                     </button>
+                    
+                    {% if laptop.product_url %}
+                    <a href="{{ url_for('laptop_redirect', laptop_id=laptop.id) }}" class="btn btn-success w-100" target="_blank">
+                        <i class="fas fa-shopping-cart me-2"></i>Buy Now
+                    </a>
+                    {% endif %}
                 </div>
             </div>
             

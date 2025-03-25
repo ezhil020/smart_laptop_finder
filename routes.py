@@ -180,12 +180,45 @@ def laptop_detail(laptop_id):
                 laptop_id=laptop_id
             ).first() is not None
     
+    # Extract features to JSON-safe data for the JavaScript to use
+    laptop_features = {
+        'id': laptop.id,
+        'brand': laptop.brand,
+        'model': laptop.model,
+        'price': laptop.price,
+        'cpu': laptop.cpu,
+        'gpu': laptop.gpu if laptop.gpu else 'Integrated Graphics',
+        'ram': laptop.ram,
+        'storage': f"{laptop.storage_capacity} GB {laptop.storage_type}",
+        'display': f"{laptop.display_size}\" {laptop.display_resolution}",
+        'weight': laptop.weight,
+        'battery': laptop.battery_life,
+        'rating': laptop.user_rating if laptop.user_rating else 4.0,
+        'cinebench': laptop.cinebench_score if laptop.cinebench_score else 0,
+        'geekbench': laptop.geekbench_score if laptop.geekbench_score else 0,
+        'gaming_fps': laptop.gaming_fps if laptop.gaming_fps else 0,
+        'product_url': laptop.product_url
+    }
+    
     return render_template(
         'laptop_detail.html',
         laptop=laptop,
+        laptop_json=laptop_features,
         similar_laptops=similar_laptops,
         is_favorite=is_favorite
     )
+
+@app.route('/laptop/redirect/<int:laptop_id>')
+def laptop_redirect(laptop_id):
+    """Redirect to external product page for a laptop"""
+    with app.app_context():
+        laptop = Laptop.query.get_or_404(laptop_id)
+        
+        if laptop.product_url:
+            return redirect(laptop.product_url)
+        else:
+            flash('No product link available for this laptop', 'warning')
+            return redirect(url_for('laptop_detail', laptop_id=laptop_id))
 
 @app.route('/comparison')
 def comparison():
@@ -307,6 +340,7 @@ def api_laptop_detail(laptop_id):
             'brand': laptop.brand,
             'model': laptop.model,
             'price': laptop.price,
+            'product_url': laptop.product_url,
             'cpu': laptop.cpu,
             'gpu': laptop.gpu,
             'ram': laptop.ram,

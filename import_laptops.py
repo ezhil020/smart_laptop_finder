@@ -115,11 +115,15 @@ def import_laptops_from_csv(csv_path):
                     price_perf_ratio = perf_score / price_usd if price_usd > 0 else 0.5
                     price_perf_ratio = min(1.0, price_perf_ratio)  # Normalize to max 1.0
                     
+                    # Extract product URL
+                    product_url = str(row['link']) if pd.notna(row.get('link')) else None
+                    
                     # Create laptop record
                     laptop = Laptop(
                         brand=brand,
                         model=model,
                         price=price_usd,
+                        product_url=product_url,
                         cpu=cpu,
                         gpu=gpu,
                         ram=ram,

@@ -7,6 +7,7 @@ class Laptop(db.Model):
     brand = db.Column(db.String(100), nullable=False)
     model = db.Column(db.String(500), nullable=False)  # Increased length for longer model names
     price = db.Column(db.Float, nullable=False)
+    product_url = db.Column(db.String(1000), nullable=True)  # URL to the product page
     
     # Basic specifications
     cpu = db.Column(db.String(200), nullable=False)  # Increased length for CPU descriptions

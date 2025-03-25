@@ -51,8 +51,8 @@ class Laptop(db.Model):
     
     def __repr__(self):
         return f"<Laptop {self.brand} {self.model}>"
-        
-def to_dict(self):
+    
+    def to_dict(self):
     return {
         'id': self.id,
         'brand': self.brand,

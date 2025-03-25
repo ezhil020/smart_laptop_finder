@@ -27,7 +27,7 @@
                 {% endif %}
             </div>
             <div class="col-md-4">
-                <strong>Budget Range:</strong> ₹{{ "{:,.2f}"|format(preferences.budget_min) }} - ₹{{ "{:,.2f}"|format(preferences.budget_max) }}
+                <strong>Budget Range:</strong> ₹{{ "%.2f"|format(preferences.budget_min|float) }} - ₹{{ "%.2f"|format(preferences.budget_max|float) }}
             </div>
             <div class="col-md-4">
                 <strong>Performance Priority:</strong> 

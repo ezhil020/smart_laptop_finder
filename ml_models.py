@@ -145,12 +145,12 @@ class LaptopRecommender:
                 return []
 
             # Extract user preferences
-            brand_prefs = user_preferences.get('brand_pref', [])  # User preferred brands
+            brand_pref = user_preferences.get('brand_pref')  # User preferred brand
             budget_max = user_preferences.get('budget_max', 5000)
 
             # Apply brand preference filtering FIRST
-            if brand_prefs:
-                laptops = [laptop for laptop in laptops if laptop.brand in brand_prefs]
+            if brand_pref:
+                laptops = [laptop for laptop in laptops if laptop.brand == brand_pref]
 
             # If brand filtering removed all options, revert to all laptops
             if not laptops:

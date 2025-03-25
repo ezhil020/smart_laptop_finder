@@ -98,10 +98,9 @@ class UserPreference(db.Model):
     budget_min = db.Column(db.Float, nullable=True)
     budget_max = db.Column(db.Float, nullable=True)
 
-    # Brand preference (NEW FIELD)
-    brand_pref = db.Column(db.String(500),
-                           nullable=True)  # Store as comma-separated string
-
+    # Brand preference
+    brand_pref = db.Column(db.String(500), nullable=True)
+    
     # Use case preferences
     use_case_gaming = db.Column(db.Boolean, default=False)
     use_case_business = db.Column(db.Boolean, default=False)

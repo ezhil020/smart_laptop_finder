@@ -75,9 +75,7 @@ def submit_questionnaire():
     budget_max = float(request.form.get('budget_max', 5000))
 
     # Extract brand preference (multiple values)
-    brand_pref_list = request.form.getlist('brand_pref')  # Get list of brands
-    brand_pref = ",".join(
-        brand_pref_list) if brand_pref_list else None  # Convert list to string
+    brand_pref = request.form.get('brand_pref')  # Get single brand preference
 
     with app.app_context():
         # Create user preference object

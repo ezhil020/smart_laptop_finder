@@ -265,24 +265,29 @@ def add_to_favorites(laptop_id):
     
     session_id = session['user_session_id']
     
-    with app.app_context():
-        # Check if laptop exists
-        laptop = Laptop.query.get_or_404(laptop_id)
-        
-        # Check if already in favorites
-        existing = Favorite.query.filter_by(
-            session_id=session_id,
-            laptop_id=laptop_id
-        ).first()
-        
-        if not existing:
-            # Add to favorites
-            favorite = Favorite(session_id=session_id, laptop_id=laptop_id)
-            db.session.add(favorite)
-            db.session.commit()
-            flash('Laptop added to favorites!', 'success')
-        else:
-            flash('Laptop already in favorites!', 'info')
+    try:
+        with app.app_context():
+            # Check if laptop exists
+            laptop = Laptop.query.get_or_404(laptop_id)
+            
+            # Check if already in favorites
+            existing = Favorite.query.filter_by(
+                session_id=session_id,
+                laptop_id=laptop_id
+            ).first()
+            
+            if not existing:
+                # Add to favorites
+                favorite = Favorite(session_id=session_id, laptop_id=laptop_id)
+                db.session.add(favorite)
+                db.session.commit()
+                flash('Laptop added to favorites!', 'success')
+            else:
+                flash('Laptop already in favorites!', 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash('Error adding to favorites!', 'error')
+        logging.error(f"Error adding favorite: {str(e)}")
     
     # Redirect back to laptop detail page
     return redirect(url_for('laptop_detail', laptop_id=laptop_id))

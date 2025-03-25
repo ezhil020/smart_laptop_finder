@@ -146,7 +146,7 @@ function initPricePerformanceChart() {
                     position: 'bottom',
                     title: {
                         display: true,
-                        text: 'Price ($)'
+                        text: 'Price (₹)'
                     }
                 },
                 y: {

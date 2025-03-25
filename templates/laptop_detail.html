@@ -276,7 +276,7 @@
                     <div class="row align-items-center mb-4">
                         <div class="col-md-6 mb-3 mb-md-0">
                             <div class="text-center">
-                                <div class="price-tag mb-2">₹{{ "{:,.0f}"|format(laptop.price) }}</div>
+                                <div class="price-tag mb-2">₹{{ "{:,.0f}".format(laptop.price) }}</div>
                                 <div class="text-muted">
                                     {% if laptop.value_category == 'Budget' %}
                                     <span class="badge bg-success">Budget-Friendly</span>

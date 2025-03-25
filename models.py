@@ -53,9 +53,9 @@ class Laptop(db.Model):
         return f"<Laptop {self.brand} {self.model}>"
     
     def to_dict(self):
-    return {
-        'id': self.id,
-        'brand': self.brand,
+        return {
+            'id': self.id,
+            'brand': self.brand,
         'model': self.model,
         'price': self.price,
         'cpu': self.cpu,

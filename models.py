@@ -4,26 +4,26 @@ from datetime import datetime
 # Laptop model
 class Laptop(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    brand = db.Column(db.String(50), nullable=False)
-    model = db.Column(db.String(100), nullable=False)
+    brand = db.Column(db.String(100), nullable=False)
+    model = db.Column(db.String(500), nullable=False)  # Increased length for longer model names
     price = db.Column(db.Float, nullable=False)
     
     # Basic specifications
-    cpu = db.Column(db.String(100), nullable=False)
-    gpu = db.Column(db.String(100), nullable=True)
+    cpu = db.Column(db.String(200), nullable=False)  # Increased length for CPU descriptions
+    gpu = db.Column(db.String(200), nullable=True)   # Increased length for GPU descriptions
     ram = db.Column(db.Integer, nullable=False)  # In GB
-    storage_type = db.Column(db.String(20), nullable=False)  # SSD, HDD, Hybrid
+    storage_type = db.Column(db.String(50), nullable=False)  # SSD, HDD, Hybrid
     storage_capacity = db.Column(db.Integer, nullable=False)  # In GB
     
     # Display
     display_size = db.Column(db.Float, nullable=False)  # In inches
-    display_resolution = db.Column(db.String(20), nullable=False)  # e.g., 1920x1080
+    display_resolution = db.Column(db.String(50), nullable=False)  # e.g., 1920x1080
     display_refresh_rate = db.Column(db.Integer, nullable=True)  # In Hz
     
     # Other specifications
     weight = db.Column(db.Float, nullable=True)  # In kg
     battery_life = db.Column(db.Float, nullable=True)  # In hours
-    operating_system = db.Column(db.String(50), nullable=True)
+    operating_system = db.Column(db.String(100), nullable=True)
     
     # Performance benchmarks
     cinebench_score = db.Column(db.Integer, nullable=True)
@@ -32,8 +32,8 @@ class Laptop(db.Model):
     
     # User ratings and categorization
     user_rating = db.Column(db.Float, nullable=True)  # 1-5 scale
-    build_quality = db.Column(db.String(20), nullable=True)  # Poor, Average, Good, Excellent
-    value_category = db.Column(db.String(20), nullable=True)  # Budget, Mid-Range, High-End
+    build_quality = db.Column(db.String(100), nullable=True)  # Poor, Average, Good, Excellent
+    value_category = db.Column(db.String(50), nullable=True)  # Budget, Mid-Range, High-End
     
     # Use cases
     suitable_for_gaming = db.Column(db.Boolean, default=False)

@@ -34,7 +34,10 @@ def import_laptops_from_csv(csv_path):
                 try:
                     # Extract and clean basic info
                     brand = str(row['company']).strip() if pd.notna(row['company']) else "Unknown"
+                    brand = brand[:100]  # Limit to 100 chars
+                    
                     model = str(row['name']).strip() if pd.notna(row['name']) else "Unknown Model"
+                    model = model[:500]  # Limit to 500 chars
                     
                     # Convert price (assuming in Rupees) to dollars for consistency
                     # Using a rough conversion rate of 75 INR = 1 USD
@@ -43,9 +46,12 @@ def import_laptops_from_csv(csv_path):
                     
                     # Extract CPU and GPU info
                     cpu = str(row['Processor name']).strip() if pd.notna(row['Processor name']) else "Unknown CPU"
+                    cpu = cpu[:200]  # Limit to 200 chars
+                    
                     # Handle column name with trailing space
                     gpu_column = 'gpu name ' if 'gpu name ' in row else 'gpu name'
                     gpu = str(row[gpu_column]).strip() if pd.notna(row[gpu_column]) else "Integrated Graphics"
+                    gpu = gpu[:200]  # Limit to 200 chars
                     
                     # Extract RAM and storage
                     ram = int(row['RAM (in GB)']) if pd.notna(row['RAM (in GB)']) else 8
@@ -55,6 +61,7 @@ def import_laptops_from_csv(csv_path):
                     # Extract display info
                     display_size = float(row['Screen Size (in inch)']) if pd.notna(row['Screen Size (in inch)']) else 15.6
                     display_resolution = str(row['screen_resolution']).strip() if pd.notna(row['screen_resolution']) else "1920x1080"
+                    display_resolution = display_resolution[:50]  # Limit to 50 chars
                     refresh_rate = int(row['Refresh Rate']) if pd.notna(row['Refresh Rate']) else 60
                     
                     # Physical attributes
@@ -63,6 +70,7 @@ def import_laptops_from_csv(csv_path):
                     
                     # OS info
                     os = str(row['Operating System']).strip() if pd.notna(row['Operating System']) else "Windows 10"
+                    os = os[:100]  # Limit to 100 chars
                     
                     # Performance benchmarks
                     cinebench_score = int(row['Cinebench R23 Score']) if pd.notna(row['Cinebench R23 Score']) else None
@@ -78,6 +86,7 @@ def import_laptops_from_csv(csv_path):
                     # Ratings and categorization
                     user_rating = float(row['user rating']) if pd.notna(row['user rating']) else 4.0
                     build_quality = str(row['Build Material']).strip() if pd.notna(row['Build Material']) else "Average"
+                    build_quality = build_quality[:100]  # Limit to 100 chars
                     
                     # Price category based on price
                     if price_usd < 500:
@@ -86,6 +95,7 @@ def import_laptops_from_csv(csv_path):
                         value_category = "Mid-Range"
                     else:
                         value_category = "High-End"
+                    value_category = value_category[:50]  # Limit to 50 chars
                     
                     # Use cases based on specifications
                     is_gaming = "gaming" in str(row['Type']).lower() or "gtx" in str(gpu).lower() or "rtx" in str(gpu).lower()

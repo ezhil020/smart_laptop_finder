@@ -256,24 +256,43 @@ class LaptopRecommender:
         Returns:
             Feature vector compatible with the model
         """
-        # Create a default vector
+        # Map display size preference to actual size
+        display_sizes = {
+            'small': 14.0,
+            'medium': 15.6,
+            'large': 17.3
+        }
+        
+        # Map gaming level to expected FPS
+        gaming_fps = {
+            'casual': 60,
+            'moderate': 90,
+            'intensive': 144
+        }
+        
+        # Adjust performance scores based on priorities
+        perf_priority = user_preferences.get('performance_priority', 3)
+        base_cinebench = 8000 + (perf_priority * 2000)
+        base_geekbench = 4000 + (perf_priority * 1000)
+        
+        # Create user vector with all preferences
         user_vector = [
             user_preferences.get('budget_max', 1000),  # price
-            user_preferences.get('ram', 8),  # ram
+            16 if perf_priority >= 4 else 8,  # ram
             user_preferences.get('storage', 512),  # storage_capacity
-            user_preferences.get('display_size', 15.6),  # display_size
-            user_preferences.get('refresh_rate', 60),  # refresh_rate
-            user_preferences.get('battery_life', 8),  # battery_life
-            10000,  # cinebench_score - default value
-            5000,  # geekbench_score - default value
-            user_preferences.get('gaming_performance', 60),  # gaming_fps
+            display_sizes.get(user_preferences.get('display_size', 'medium'), 15.6),  # display_size
+            144 if perf_priority >= 4 else 60,  # refresh_rate
+            user_preferences.get('battery_priority', 3) * 2,  # battery_life
+            base_cinebench,  # cinebench_score
+            base_geekbench,  # geekbench_score
+            gaming_fps.get(user_preferences.get('gaming_level', 'casual'), 60),  # gaming_fps
             4.0,  # user_rating - default value
             1 if user_preferences.get('use_case') == 'gaming' else 0,  # for_gaming
             1 if user_preferences.get('use_case') == 'business' else 0,  # for_business
             1 if user_preferences.get('use_case') == 'student' else 0,  # for_students
             1 if user_preferences.get('use_case') == 'content_creation' else 0,  # for_content_creation
-            1 if user_preferences.get('storage_type') == 'SSD' else 0,  # is_ssd
-            user_preferences.get('weight', 2.0),  # weight
+            1,  # is_ssd - prefer SSD for better performance
+            3.0 if user_preferences.get('portability_priority', 3) <= 2 else 1.5,  # weight
             0.8  # price_performance_ratio - default value
         ]
         

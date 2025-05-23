@@ -3,6 +3,7 @@
 {% block title %}Laptop Comparison{% endblock %}
 
 {% block content %}
+
 <div class="container my-5">
     <h1 class="mb-4">Laptop Comparison</h1>
     
@@ -18,7 +19,7 @@
         <table class="table comparison-table">
             <thead>
                 <tr>
-                    <th scope="col">Specification</th>
+                    <th scope="col">Price</th>
                     {% for laptop in laptops %}
                     <th scope="col">
                         <div class="text-center">
@@ -32,14 +33,15 @@
             </thead>
             <tbody>
                 <!-- Basic Specs -->
-                <tr class="spec-row" data-higher-better="false">
+                <!-- <tr class="spec-row" data-higher-better="false">
                     <th scope="row">Price</th>
                     {% for laptop in laptops %}
                     <td class="text-center spec-value" data-raw-value="{{ laptop.price }}">
                         ${{ "%.2f"|format(laptop.price) }}
                     </td>
                     {% endfor %}
-                </tr>
+                </tr> -->
+                
                 <tr class="spec-row" data-higher-better="true">
                     <th scope="row">CPU</th>
                     {% for laptop in laptops %}
@@ -221,7 +223,6 @@
             </tbody>
         </table>
     </div>
-    
     <!-- Visualization Section -->
     <div class="row g-4 mb-4">
         <!-- Performance Radar Chart -->
@@ -231,7 +232,7 @@
                     <h5 class="mb-0">Performance Comparison</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="performanceChart" data-laptops="{{ laptops|tojson }}"></canvas>
+                    <canvas id="performanceChart" data-laptops='{{ laptops|tojson }}'></canvas>
                 </div>
             </div>
         </div>
@@ -243,13 +244,38 @@
                     <h5 class="mb-0">Price vs. Performance</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="pricePerformanceChart" data-laptops="{{ laptops|tojson }}"></canvas>
+                    <canvas id="pricePerformanceChart" data-laptops='{{ laptops|tojson }}'></canvas>
                 </div>
                 <div class="card-footer">
                     <small class="text-muted">
                         <i class="fas fa-info-circle me-1"></i>
                         Higher and to the left indicates better value for money
                     </small>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4 mb-4">
+            <!-- RAM and Storage Comparison Chart -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">RAM and Storage Comparison</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="ramStorageChart" data-laptops='{{ laptops|tojson }}'></canvas>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Price vs. Battery Life Scatter Plot -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Price vs. Battery Life</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="priceBatteryChart" data-laptops='{{ laptops|tojson }}'></canvas>
+                    </div>  
                 </div>
             </div>
         </div>

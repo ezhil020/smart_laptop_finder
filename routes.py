@@ -74,8 +74,12 @@ def submit_questionnaire():
     budget_min = float(request.form.get('budget_min', 0))
     budget_max = float(request.form.get('budget_max', 5000))
 
-    # Extract brand preference (multiple values)
-    brand_pref = request.form.get('brand_pref')  # Get single brand preference
+    # ✅ Fix: Define brand_pref_list before using it
+    brand_pref_list = request.form.getlist('brand_pref')  # Extracts list of selected brands
+    brand_pref = ",".join(brand_pref_list) if brand_pref_list else None  # Convert list to string
+    print("------------------------brand pref---------")
+    print(brand_pref)
+    print(type(brand_pref))
 
     with app.app_context():
         # Create user preference object
@@ -88,45 +92,32 @@ def submit_questionnaire():
             use_case_business=(use_case == 'business'),
             use_case_student=(use_case == 'student'),
             use_case_content_creation=(use_case == 'content_creation'),
-            priority_cpu_performance=int(
-                request.form.get('priority_performance', 3)),
-            priority_gpu_performance=int(
-                request.form.get('priority_performance', 3))
-            if use_case in ['gaming', 'content_creation'] else 2,
-            preferred_display_size='Large' if int(
-                request.form.get('priority_display', 3)) >= 4 else 'Medium',
-            battery_life_importance=int(request.form.get(
-                'priority_battery', 3)),
-            build_quality_importance=int(request.form.get('build_quality', 3)))
+            priority_cpu_performance=int(request.form.get('priority_performance', 3)),
+            priority_gpu_performance=int(request.form.get('priority_performance', 3)) if use_case in ['gaming', 'content_creation'] else 2,
+            preferred_display_size='Large' if int(request.form.get('priority_display', 3)) >= 4 else 'Medium',
+            battery_life_importance=int(request.form.get('priority_battery', 3)),
+            build_quality_importance=int(request.form.get('build_quality', 3))
+        )
 
         db.session.add(user_pref)
         db.session.commit()
-
-        # Convert brand_pref string back into a list for filtering in ML model
+        
+        # ✅ Fix: Pass brand_pref_list properly
         user_prefs_dict = {
-            'use_case':
-            use_case,
-            'budget_min':
-            budget_min,
-            'budget_max':
-            budget_max,
-            'brand_pref':
-            brand_pref_list,  # Pass list instead of string
-            'performance_priority':
-            int(request.form.get('priority_performance', 3)),
-            'battery_priority':
-            int(request.form.get('priority_battery', 3)),
-            'display_priority':
-            int(request.form.get('priority_display', 3)),
-            'portability_priority':
-            int(request.form.get('priority_portability', 3))
+            'use_case': use_case,
+            'budget_min': budget_min,
+            'budget_max': budget_max,
+            'brand_pref': brand_pref_list,  # ✅ Pass list instead of string
+            'performance_priority': int(request.form.get('priority_performance', 3)),
+            'battery_priority': int(request.form.get('priority_battery', 3)),
+            'display_priority': int(request.form.get('priority_display', 3)),
+            'portability_priority': int(request.form.get('priority_portability', 3))
         }
 
         # Get recommendations from ML model
-        recommended_ids = laptop_recommender.recommend_laptops(user_prefs_dict,
-                                                               limit=3)
-
+        recommended_ids = laptop_recommender.recommend_laptops(user_prefs_dict, limit=3)
         return redirect(url_for('results', pref_id=user_pref.id))
+
 
 
 @app.route('/results/<int:pref_id>')
@@ -135,6 +126,8 @@ def results(pref_id):
     with app.app_context():
         # Get the user preference
         user_pref = UserPreference.query.get_or_404(pref_id)
+        print("------------user_pref------------")
+        print(user_pref)
 
         # Create user preferences dictionary for the ML model
         user_prefs_dict = {
@@ -150,7 +143,9 @@ def results(pref_id):
             'performance_priority':
             user_pref.priority_cpu_performance,
             'battery_priority':
-            user_pref.battery_life_importance
+            user_pref.battery_life_importance,
+            'brand_pref': 
+            user_pref.brand_pref.split(',') if user_pref.brand_pref else []  # Include brand_pref as a list
         }
 
         # Get recommendations
@@ -159,6 +154,8 @@ def results(pref_id):
 
         recommended_laptops = Laptop.query.filter(
             Laptop.id.in_(recommended_ids)).all() if recommended_ids else []
+        print("recommmended laptops---------------------------")
+        print(recommended_laptops)
 
         # If we don't have enough recommendations, get some based on best value
         if len(recommended_laptops) < 3:

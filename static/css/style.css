@@ -152,7 +152,6 @@ body {
 /* Comparison Page Styles */
 .comparison-table th {
     position: sticky;
-    top: 60px;
     background-color: var(--bs-body-bg);
     z-index: 1;
 }

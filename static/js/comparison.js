@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize comparison charts
     initPerformanceChart();
     initPricePerformanceChart();
+    initRamStorageChart();
+    initPriceBatteryChart()
     
     // Add to comparison functionality
     setupComparisonButtons();
@@ -24,6 +26,44 @@ document.addEventListener('DOMContentLoaded', function() {
 /**
  * Highlights the best specification in each row of the comparison table
  */
+function initPriceBatteryChart() {
+    const priceBatteryChart = document.getElementById('priceBatteryChart');
+    if (!priceBatteryChart) return;
+
+    const laptops = JSON.parse(priceBatteryChart.dataset.laptops || '[]');
+    if (laptops.length === 0) return;
+
+    const datasets = laptops.map((laptop, index) => ({
+        label: `${laptop.brand} ${laptop.model}`,
+        data: [{ x: laptop.price, y: laptop.battery_life }],
+        backgroundColor: `rgba(${index * 50}, ${255 - index * 50}, ${index * 100}, 0.7)`,
+        borderColor: `rgba(${index * 50}, ${255 - index * 50}, ${index * 100}, 1)`,
+        pointRadius: 10
+    }));
+
+    new Chart(priceBatteryChart, {
+        type: 'scatter',
+        data: { datasets: datasets },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Price (₹)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Battery Life (hours)'
+                    }
+                }
+            }
+        }
+    });
+}
+
 function highlightBestSpecs() {
     const specRows = document.querySelectorAll('.spec-row');
     
@@ -58,6 +98,7 @@ function highlightBestSpecs() {
 /**
  * Initializes the performance comparison chart
  */
+
 function initPerformanceChart() {
     const performanceChart = document.getElementById('performanceChart');
     

@@ -4,65 +4,46 @@
  * Provides chart functionality for detailed laptop pages and comparison views.
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize any charts on the page
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize all charts
     initBenchmarkCharts();
     initValueCharts();
+    initRamStorageChart();
+    initPriceBatteryChart();
 });
 
 /**
- * Initializes benchmark comparison charts
+ * Initializes the RAM and Storage Comparison Chart
  */
-function initBenchmarkCharts() {
-    const benchmarkChart = document.getElementById('benchmarkChart');
-    
-    if (!benchmarkChart) return;
-    
-    // Get laptop data
-    const laptopData = JSON.parse(benchmarkChart.dataset.laptop || '{}');
-    const similarLaptops = JSON.parse(benchmarkChart.dataset.similarLaptops || '[]');
-    
-    if (!laptopData.id) return;
-    
-    // Combine main laptop with similar ones
-    const allLaptops = [laptopData, ...similarLaptops];
-    
-    // Create chart data
-    const labels = allLaptops.map(laptop => `${laptop.brand} ${laptop.model}`);
-    
-    // Create normalized scores (percentage of the maximum in each category)
-    const maxCinebench = Math.max(...allLaptops.map(l => l.cinebench_score || 0));
-    const maxGeekbench = Math.max(...allLaptops.map(l => l.geekbench_score || 0));
-    const maxGamingFps = Math.max(...allLaptops.map(l => l.gaming_fps || 0));
-    
-    const cinebenchData = allLaptops.map(l => ((l.cinebench_score || 0) / maxCinebench * 100).toFixed(1));
-    const geekbenchData = allLaptops.map(l => ((l.geekbench_score || 0) / maxGeekbench * 100).toFixed(1));
-    const gamingFpsData = allLaptops.map(l => ((l.gaming_fps || 0) / maxGamingFps * 100).toFixed(1));
-    
-    new Chart(benchmarkChart, {
+function initRamStorageChart() {
+    const ramStorageChart = document.getElementById('ramStorageChart');
+    if (!ramStorageChart) return;
+
+    const laptops = JSON.parse(ramStorageChart.dataset.laptops || '[]');
+    if (laptops.length === 0) return;
+
+    const labels = laptops.map(laptop => `${laptop.brand} ${laptop.model}`);
+    const ramData = laptops.map(laptop => laptop.ram || 0);
+    const storageData = laptops.map(laptop => laptop.storage_capacity || 0);
+
+    new Chart(ramStorageChart, {
         type: 'bar',
         data: {
             labels: labels,
             datasets: [
                 {
-                    label: 'Cinebench (CPU)',
-                    data: cinebenchData,
+                    label: 'RAM (GB)',
+                    data: ramData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Storage (GB)',
+                    data: storageData,
                     backgroundColor: 'rgba(75, 192, 192, 0.7)',
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Geekbench (Overall)',
-                    data: geekbenchData,
-                    backgroundColor: 'rgba(153, 102, 255, 0.7)',
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Gaming FPS',
-                    data: gamingFpsData,
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
                     borderWidth: 1
                 }
             ]
@@ -72,28 +53,9 @@ function initBenchmarkCharts() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 100,
                     title: {
                         display: true,
-                        text: 'Relative Performance (%)'
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const index = context.dataIndex;
-                            const datasetIndex = context.datasetIndex;
-                            
-                            if (datasetIndex === 0) {
-                                return `Cinebench: ${allLaptops[index].cinebench_score || 'N/A'} (${context.raw}%)`;
-                            } else if (datasetIndex === 1) {
-                                return `Geekbench: ${allLaptops[index].geekbench_score || 'N/A'} (${context.raw}%)`;
-                            } else {
-                                return `Gaming FPS: ${allLaptops[index].gaming_fps || 'N/A'} (${context.raw}%)`;
-                            }
-                        }
+                        text: 'Capacity (GB)'
                     }
                 }
             }
@@ -102,8 +64,214 @@ function initBenchmarkCharts() {
 }
 
 /**
- * Initializes price-to-performance ratio charts
+ * Initializes the Price vs. Battery Life Scatter Plot
  */
+function initPriceBatteryChart() {
+    const priceBatteryChart = document.getElementById('priceBatteryChart');
+    if (!priceBatteryChart) return;
+
+    const laptops = JSON.parse(priceBatteryChart.dataset.laptops || '[]');
+    if (laptops.length === 0) return;
+
+    const datasets = laptops.map((laptop, index) => ({
+        label: `${laptop.brand} ${laptop.model}`,
+        data: [{ x: laptop.price, y: laptop.battery_life }],
+        backgroundColor: `rgba(${index * 50}, ${255 - index * 50}, ${index * 100}, 0.7)`,
+        borderColor: `rgba(${index * 50}, ${255 - index * 50}, ${index * 100}, 1)`,
+        pointRadius: 10
+    }));
+
+    new Chart(priceBatteryChart, {
+        type: 'scatter',
+        data: { datasets: datasets },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Price (₹)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Battery Life (hours)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Initializes the RAM and Storage Comparison Chart
+ */
+function initRamStorageChart() {
+    const ramStorageChart = document.getElementById('ramStorageChart');
+    if (!ramStorageChart) return;
+
+    const laptops = JSON.parse(ramStorageChart.dataset.laptops || '[]');
+    if (laptops.length === 0) return;
+
+    const labels = laptops.map(laptop => `${laptop.brand} ${laptop.model}`);
+    const ramData = laptops.map(laptop => laptop.ram || 0);
+    const storageData = laptops.map(laptop => laptop.storage_capacity || 0);
+
+    new Chart(ramStorageChart, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'RAM (GB)',
+                    data: ramData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Storage (GB)',
+                    data: storageData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Capacity (GB)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Initializes the Price vs. Battery Life Scatter Plot
+ */
+function initPriceBatteryChart() {
+    const priceBatteryChart = document.getElementById('priceBatteryChart');
+    if (!priceBatteryChart) return;
+
+    const laptops = JSON.parse(priceBatteryChart.dataset.laptops || '[]');
+    if (laptops.length === 0) return;
+
+    const datasets = laptops.map((laptop, index) => ({
+        label: `${laptop.brand} ${laptop.model}`,
+        data: [{ x: laptop.price, y: laptop.battery_life }],
+        backgroundColor: `rgba(${index * 50}, ${255 - index * 50}, ${index * 100}, 0.7)`,
+        borderColor: `rgba(${index * 50}, ${255 - index * 50}, ${index * 100}, 1)`,
+        pointRadius: 10
+    }));
+
+    new Chart(priceBatteryChart, {
+        type: 'scatter',
+        data: { datasets: datasets },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Price (₹)'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Battery Life (hours)'
+                    }
+                }
+            }
+        }
+    });
+}
+/**
+ * Initializes benchmark comparison charts
+ */
+
+function initBenchmarkCharts() {
+    const performanceChart = document.getElementById('performanceChart');
+    const pricePerformanceChart = document.getElementById('pricePerformanceChart');
+
+    if (!performanceChart || !pricePerformanceChart) return;
+
+    // Get laptop data
+    const laptops = JSON.parse(performanceChart.dataset.laptops || '[]');
+    console.log(laptops);
+
+    if (laptops.length === 0) return;
+
+    // Create chart data for performance chart
+    const labels = laptops.map(laptop => `${laptop.brand} ${laptop.model}`);
+    const cinebenchData = laptops.map(laptop => laptop.cinebench_score || 0);
+    const geekbenchData = laptops.map(laptop => laptop.geekbench_score || 0);
+    const gamingFpsData = laptops.map(laptop => laptop.gaming_fps || 0);
+
+    // Render the performance radar chart
+    new Chart(performanceChart, {
+        type: 'radar',
+        data: {
+            labels: ['Cinebench (CPU)', 'Geekbench (Overall)', 'Gaming FPS'],
+            datasets: laptops.map((laptop, index) => ({
+                label: `${laptop.brand} ${laptop.model}`,
+                data: [
+                    laptop.cinebench_score || 0,
+                    laptop.geekbench_score || 0,
+                    laptop.gaming_fps || 0,
+                ],
+                backgroundColor: `rgba(${index * 50}, ${index * 100}, ${index * 150}, 0.2)`,
+                borderColor: `rgba(${index * 50}, ${index * 100}, ${index * 150}, 1)`,
+                borderWidth: 1,
+            })),
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+            },
+        },
+    });
+
+    // Create chart data for price-performance chart
+    const pricePerformanceLabels = laptops.map(laptop => `${laptop.brand} ${laptop.model}`);
+    const pricePerformanceData = laptops.map(laptop => laptop.price_performance_ratio || 0);
+
+    // Render the price-performance bar chart
+    new Chart(pricePerformanceChart, {
+        type: 'bar',
+        data: {
+            labels: pricePerformanceLabels,
+            datasets: [
+                {
+                    label: 'Price-Performance Ratio',
+                    data: pricePerformanceData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+            },
+        },
+    });
+}
 function initValueCharts() {
     const valueChart = document.getElementById('valueChart');
     

@@ -21,6 +21,36 @@ class LaptopRecommender:
         self.laptop_features = None
         self.laptop_ids = None
 
+    def _create_user_vector(self, user_preferences):
+        perf_priority = user_preferences.get('performance_priority', 3)
+        base_cinebench = 8000 + (perf_priority * 2000)
+        base_geekbench = 4000 + (perf_priority * 1000)
+        gaming_fps = 144 if user_preferences.get('use_case') == 'gaming' else 60
+
+
+        user_vector = [
+            user_preferences.get('budget_max', 1000),
+            16 if perf_priority >= 4 else 8,
+            user_preferences.get('storage', 512),
+            user_preferences.get('display_size', 15.6),
+            gaming_fps,
+            user_preferences.get('battery_priority', 3) * 2,
+            base_cinebench,
+            base_geekbench,
+            gaming_fps,
+            4.5,
+            1 if user_preferences.get('use_case') == 'gaming' else 0,
+            1 if user_preferences.get('use_case') == 'business' else 0,
+            1 if user_preferences.get('use_case') == 'student' else 0,
+            1 if user_preferences.get('use_case') == 'content_creation' else 0,
+            1,
+            2.0 if user_preferences.get('portability_priority', 3) <= 2 else 1.5,
+            0.9
+        ]
+        return user_vector
+
+    
+
     def initialize_models(self):
         """Initialize and train all ML models"""
         logging.info("Initializing ML models...")
@@ -63,6 +93,7 @@ class LaptopRecommender:
                 'gaming_fps':
                 laptop.gaming_fps or 0,
                 'user_rating':
+
                 laptop.user_rating or 3.0,
                 'for_gaming':
                 1 if laptop.suitable_for_gaming else 0,
@@ -79,8 +110,8 @@ class LaptopRecommender:
                 'price_performance_ratio':
                 laptop.price_performance_ratio or 0.8
             })
-
         df = pd.DataFrame(laptop_data)
+        print("df", df)
         self.laptop_ids = df['id'].values
 
         # Create feature matrix for content-based filtering
@@ -133,7 +164,8 @@ class LaptopRecommender:
 
     def recommend_laptops(self, user_preferences, limit=3):
         """Recommend laptops based on user preferences, prioritizing brand preference properly."""
-
+        print("-----------user_preferences----------------------")
+        print(user_preferences)
         if self.laptop_features is None:
             self.initialize_models()
             if self.laptop_features is None:
@@ -141,6 +173,8 @@ class LaptopRecommender:
 
         with app.app_context():
             laptops = Laptop.query.all()
+                
+        
             if not laptops:
                 return []
 
@@ -148,9 +182,18 @@ class LaptopRecommender:
             brand_pref = user_preferences.get('brand_pref')  # User preferred brand
             budget_max = user_preferences.get('budget_max', 5000)
 
+            
+
             # Apply brand preference filtering FIRST
             if brand_pref:
-                laptops = [laptop for laptop in laptops if laptop.brand == brand_pref]
+                laptops = [
+                laptop for laptop in laptops
+                if laptop.brand.strip().lower() in [b.strip().lower() for b in brand_pref]
+                ]
+                
+                
+                # Debugging: Check if laptop.brand is available
+               
 
             # If brand filtering removed all options, revert to all laptops
             if not laptops:
@@ -159,8 +202,9 @@ class LaptopRecommender:
             # Create user preference vector
             user_vector = self._create_user_vector(user_preferences)
             user_vector_scaled = self.scaler.transform([user_vector])
+            print("user_vector_scaled", user_vector_scaled)
 
-            # Compute similarity scores
+            # Compute similarity scores 
             similarity_scores = cosine_similarity(user_vector_scaled, self.laptop_features)[0]
 
             # Sort based on similarity
@@ -171,7 +215,8 @@ class LaptopRecommender:
             filtered_laptops = [l for l in laptops if l.id in sorted_laptop_ids and l.price <= budget_max]
 
             # Return the top `limit` recommendations
-            return [l.id for l in filtered_laptops[:limit]]
+            return [l.id for l in filtered_laptops[:limit]]    
+
 
 
     def find_similar_laptops(self, laptop_id, limit=3):
@@ -234,6 +279,7 @@ class LaptopRecommender:
             if not laptops:
                 logging.warning(f"No laptops found within budget {budget}")
                 return []
+
 
             laptop_scores = []
             for laptop in laptops:
